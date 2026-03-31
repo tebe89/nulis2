@@ -3,74 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEBE v15 - Dual Engine Masterpiece</title>
+    <title>TEBE v15 - Dual Engine Master</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="flex flex-col md:flex-row min-h-screen">
+<body class="flex flex-col md:flex-row min-h-screen bg-[#080808]">
 
-    <div id="aiPopup" class="hidden fixed inset-0 z-[999] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-        <div class="bg-[#1a1a1a] border border-gray-800 p-6 rounded-2xl text-center shadow-2xl max-w-[280px] w-full">
-            <div class="loader mb-3 mx-auto"></div>
-            <h3 class="text-white font-bold text-sm novel-font" id="popupStatus">Memproses...</h3>
-            <div id="popupTimer" class="text-yellow-500 text-lg font-black my-1">0s</div>
-            <div id="engineStatus" class="text-[10px] font-bold italic tracking-widest uppercase">Dual Engine Active</div>
-            <button onclick="window.cancelProcess()" class="mt-4 text-[10px] text-red-500 border border-red-900/50 px-4 py-1 rounded-full">CANCEL</button>
+    <div id="aiPopup" class="hidden fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md">
+        <div class="bg-[#1a1a1a] border border-gray-800 p-8 rounded-3xl text-center shadow-2xl max-w-[300px] w-full">
+            <div class="loader mb-4 mx-auto"></div>
+            <h3 class="text-white font-bold text-sm" id="popupStatus">Memproses...</h3>
+            <div id="popupTimer" class="text-yellow-500 text-2xl font-black my-2">0s</div>
+            <div id="engineStatus" class="text-[10px] font-bold italic tracking-widest uppercase text-gray-500">Dual Engine Active</div>
+            <button onclick="window.cancelProcess()" class="mt-6 text-[11px] text-red-500 border border-red-900/50 px-6 py-2 rounded-full hover:bg-red-950/30 transition">CANCEL</button>
         </div>
     </div>
 
-    <div class="sidebar">
-        <div class="space-y-6">
-            <h1 class="text-xl font-bold gold-text border-b border-gray-800 pb-2 text-center">Studio v15 Master</h1>
+    <div class="sidebar flex-shrink-0 border-r border-gray-800 bg-[#0f0f0f] w-full md:w-[350px] flex flex-col h-screen overflow-hidden">
+        <div class="p-6 overflow-y-auto custom-scroll h-full">
+            <h1 class="text-2xl font-black gold-text border-b border-gray-800 pb-4 mb-6 text-center">v15 PRO</h1>
             
-            <div class="space-y-4 bg-black/40 p-4 rounded-2xl border border-gray-800">
+            <div class="space-y-4 bg-black/40 p-4 rounded-2xl border border-gray-800 mb-6">
+                <div class="space-y-3">
+                    <label class="text-[10px] font-black text-green-500 tracking-widest">ENGINE 1 (WRITER)</label>
+                    <input type="password" id="apiKey1" placeholder="API Key 1..." class="w-full p-3 input-dark text-xs">
+                    <button type="button" id="btnCheck1" onclick="window.checkEngine(1)" class="w-full py-3 bg-gray-800 text-[10px] font-bold rounded-xl uppercase tracking-tighter hover:bg-gray-700 transition">Hubungkan API 1</button>
+                    <select id="modelSelect1" class="hidden w-full p-3 input-dark text-yellow-500 text-xs font-bold"></select>
+                </div>
+
+                <div class="space-y-3 border-t border-gray-800 pt-4">
+                    <label class="text-[10px] font-black text-blue-400 tracking-widest">ENGINE 2 (ARCHITECT)</label>
+                    <input type="password" id="apiKey2" placeholder="API Key 2..." class="w-full p-3 input-dark text-xs">
+                    <button type="button" id="btnCheck2" onclick="window.checkEngine(2)" class="w-full py-3 bg-gray-800 text-[10px] font-bold rounded-xl uppercase tracking-tighter hover:bg-gray-700 transition">Hubungkan API 2</button>
+                    <select id="modelSelect2" class="hidden w-full p-3 input-dark text-blue-400 text-xs font-bold"></select>
+                </div>
+            </div>
+
+            <div class="space-y-4 mb-6">
                 <div class="space-y-2">
-                    <span class="text-[9px] font-black text-green-500 uppercase tracking-widest">🚀 ENGINE 1: PENULIS</span>
-                    <input type="password" id="apiKey1" placeholder="API Key Utama..." class="w-full p-2 input-dark text-[10px]" oninput="window.saveDraft()">
-                    <button type="button" id="btnCheck1" onclick="window.checkSpecificEngine(1)" class="w-full py-1.5 bg-gray-800 text-[9px] font-bold rounded">HUBUNGKAN PENULIS</button>
-                    <select id="modelSelect1" class="hidden w-full p-2 input-dark text-yellow-500 text-[10px]" onchange="window.saveDraft()"></select>
+                    <label class="text-[10px] font-bold text-gray-500 uppercase">Judul & Genre</label>
+                    <input type="text" id="novelTitle" placeholder="Judul Mahakarya" class="w-full p-3 input-dark text-sm">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="genre" placeholder="Genre" class="p-3 input-dark text-xs">
+                        <input type="text" id="style" placeholder="Gaya" class="p-3 input-dark text-xs">
+                    </div>
                 </div>
-
-                <div class="space-y-2 border-t border-gray-800 pt-3">
-                    <span class="text-[9px] font-black text-blue-400 uppercase tracking-widest">🧠 ENGINE 2: MEMORY</span>
-                    <input type="password" id="apiKey2" placeholder="API Key Memori..." class="w-full p-2 input-dark text-[10px]" oninput="window.saveDraft()">
-                    <button type="button" id="btnCheck2" onclick="window.checkSpecificEngine(2)" class="w-full py-1.5 bg-gray-800 text-[9px] font-bold rounded">HUBUNGKAN MEMORY</button>
-                    <select id="modelSelect2" class="hidden w-full p-2 input-dark text-blue-400 text-[10px]" onchange="window.saveDraft()"></select>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-gray-500 uppercase">World Building (Konsep)</label>
+                    <textarea id="storyIdea" rows="4" placeholder="Aturan dunia, sejarah singkat, latar belakang..." class="w-full p-3 input-dark text-xs"></textarea>
                 </div>
             </div>
 
-            <div class="space-y-2">
-                <span class="text-[10px] font-black text-gray-500 uppercase">1. Konsep & Dunia</span>
-                <input type="text" id="novelTitle" placeholder="Judul Novel" class="w-full p-2 input-dark" oninput="window.saveDraft()">
+            <div class="space-y-3 pb-20">
+                <div class="flex items-center justify-between bg-black/40 p-3 rounded-xl border border-gray-800">
+                    <span class="text-xs font-bold text-gray-400">JUMLAH BAB</span>
+                    <input type="number" id="chapterCount" value="3" class="w-16 bg-transparent text-center gold-text font-black text-lg outline-none">
+                </div>
+                <button onclick="window.planNovel()" class="w-full py-4 gold-bg text-black font-black text-xs rounded-2xl shadow-xl uppercase tracking-widest">Rancang Alur Berantai</button>
                 <div class="grid grid-cols-2 gap-2">
-                    <input type="text" id="genre" placeholder="Genre" class="p-2 input-dark" oninput="window.saveDraft()">
-                    <input type="text" id="style" placeholder="Gaya Bahasa" class="p-2 input-dark" oninput="window.saveDraft()">
+                    <button onclick="window.downloadFull('txt')" class="py-3 bg-gray-800 text-[10px] font-bold rounded-xl border border-gray-700">EKSPOR TXT</button>
+                    <button onclick="window.downloadFull('html')" class="py-3 border border-yellow-700/50 gold-text text-[10px] font-bold rounded-xl bg-yellow-950/10">EKSPOR HTML</button>
                 </div>
-                <textarea id="storyIdea" rows="3" placeholder="World Building..." class="w-full p-2 input-dark text-[11px]" oninput="window.saveDraft()"></textarea>
+                <button onclick="window.clearAllData()" class="w-full py-2 text-[9px] text-red-900 font-bold uppercase tracking-tighter">Hapus Seluruh Data Draf</button>
             </div>
-
-            <div class="space-y-2">
-                <span class="text-[10px] font-black text-gray-500 uppercase">2. Struktur</span>
-                <input type="number" id="chapterCount" value="3" class="w-full p-2 input-dark text-center gold-text font-bold">
-                <button type="button" onclick="window.planNovel()" class="w-full py-3 bg-blue-900 text-white text-[10px] font-bold rounded-lg border border-blue-500 shadow-xl">RANCANG ALUR BERANTAI</button>
-            </div>
-
-            <div class="pt-4 border-t border-gray-800 grid grid-cols-2 gap-2">
-                <button onclick="window.downloadFull('txt')" class="py-2 bg-gray-800 text-[10px] font-bold rounded">FULL TXT</button>
-                <button onclick="window.downloadFull('html')" class="py-2 border border-[#c5a059] gold-text text-[10px] font-bold rounded">FULL HTML</button>
-            </div>
-            <button onclick="window.clearAllData()" class="w-full py-1 text-[8px] text-red-900 uppercase font-bold mt-2">Hapus Draf</button>
         </div>
     </div>
 
-    <div class="main-content p-6 md:p-10">
-        <div id="mainPlaceholder" class="h-full flex flex-col items-center justify-center text-center">
-            <h2 class="text-4xl font-bold gold-text mb-4 novel-font">Dual Engine v15</h2>
-            <p class="text-gray-400 text-sm italic">"Memory Bridge Aktif. API 1 Menulis, API 2 Mengingat."</p>
+    <div class="main-content flex-1 h-screen overflow-y-auto custom-scroll p-6 md:p-12">
+        <div id="mainPlaceholder" class="h-full flex flex-col items-center justify-center text-center opacity-30">
+            <div class="p-16 border-4 border-dashed border-gray-900 rounded-[3rem]">
+                <h2 class="text-6xl font-black gold-text mb-4 italic">v15 MASTER</h2>
+                <p class="text-gray-400 tracking-[0.5em] uppercase text-[10px]">Dual Engine System Ready</p>
+            </div>
         </div>
-        <div id="novelWorkspace" class="hidden space-y-10 max-w-4xl mx-auto pb-20">
-            <div class="text-center border-b border-gray-800 pb-8">
-                <h2 id="displayTitle" class="text-5xl font-bold gold-text novel-font"></h2>
+        <div id="novelWorkspace" class="hidden max-w-5xl mx-auto space-y-16">
+            <div class="text-center space-y-4">
+                <h2 id="displayTitle" class="text-6xl font-black gold-text novel-font italic"></h2>
+                <div class="h-1 w-24 bg-yellow-700 mx-auto rounded-full"></div>
             </div>
             <div id="chaptersArea" class="space-y-12"></div>
         </div>
