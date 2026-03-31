@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEBE v15 - Master Dual Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@700;900&family=Inter:wght@400;900&display=swap');
+        body { background-color: #080808; color: #e0e0e0; font-family: 'Inter', sans-serif; overflow: hidden; }
+        .gold-text { color: #c5a059; font-family: 'Cinzel', serif; }
+        .gold-bg { background: linear-gradient(135deg, #f0c27b 0%, #c5a059 100%); }
+        .novel-font { font-family: 'Crimson Pro', serif; }
+        .sidebar { background-color: #0f0f0f; border-right: 1px solid #222; width: 100%; height: 100vh; overflow-y: auto; padding: 20px; }
+        @media (min-width: 768px) { .sidebar { width: 350px; } }
+        .input-dark { background-color: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 12px; outline: none; }
+        .summary-box, .content-box { font-family: 'Crimson Pro', serif; background-color: #121212; color: #e5e5e5; border: 1px solid #222; padding: 15px; border-radius: 12px; width: 100%; outline: none; line-height: 1.7; }
+        .bridge-box { background-color: #0c1322; border-left: 4px solid #3b82f6; color: #93c5fd; font-style: italic; font-size: 0.9rem; padding: 10px; border-radius: 8px; width: 100%; }
+        .loader { width: 35px; height: 35px; border: 4px solid #1a1a1a; border-bottom-color: #c5a059; border-radius: 50%; animation: rotation 1s linear infinite; }
+        @keyframes rotation { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row min-h-screen">
+
+    <div id="aiPopup" class="hidden fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md">
+        <div class="bg-[#1a1a1a] border border-gray-800 p-8 rounded-3xl text-center shadow-2xl max-w-[300px] w-full">
+            <div class="loader mb-4 mx-auto"></div>
+            <h3 class="text-white font-bold text-sm" id="popupStatus">Memproses...</h3>
+            <div id="popupTimer" class="text-yellow-500 text-2xl font-black my-2">0s</div>
+            <button onclick="window.cancelProcess()" class="mt-4 text-[10px] text-red-500 border border-red-900/50 px-4 py-1 rounded-full">CANCEL</button>
+        </div>
+    </div>
+
+    <div class="sidebar flex-shrink-0">
+        <h1 class="text-xl font-black gold-text border-b border-gray-800 pb-4 mb-6 text-center">v15 DUAL ENGINE</h1>
+        
+        <div class="space-y-4 bg-black/40 p-4 rounded-2xl border border-gray-800 mb-6">
+            <div class="space-y-2">
+                <span class="text-[9px] font-black text-green-500 tracking-widest uppercase">Engine 1: Penulis</span>
+                <input type="password" id="apiKey1" placeholder="API Key 1..." class="w-full p-2 input-dark text-xs">
+                <button id="btnCheck1" onclick="checkEngine(1)" class="w-full py-2 bg-gray-800 text-[10px] font-bold rounded-lg uppercase">Hubungkan API 1</button>
+                <select id="modelSelect1" class="hidden w-full p-2 input-dark text-yellow-500 text-xs"></select>
+            </div>
+            <div class="space-y-2 border-t border-gray-800 pt-3">
+                <span class="text-[9px] font-black text-blue-400 tracking-widest uppercase">Engine 2: Memori</span>
+                <input type="password" id="apiKey2" placeholder="API Key 2..." class="w-full p-2 input-dark text-xs">
+                <button id="btnCheck2" onclick="checkEngine(2)" class="w-full py-2 bg-gray-800 text-[10px] font-bold rounded-lg uppercase">Hubungkan API 2</button>
+                <select id="modelSelect2" class="hidden w-full p-2 input-dark text-blue-400 text-xs"></select>
+            </div>
+        </div>
+
+        <div class="space-y-3 mb-6">
+            <input type="text" id="novelTitle" placeholder="Judul Novel" class="w-full p-2 input-dark text-sm">
+            <div class="grid grid-cols-2 gap-2">
+                <input type="text" id="genre" placeholder="Genre" class="p-2 input-dark text-xs">
+                <input type="text" id="style" placeholder="Gaya" class="p-2 input-dark text-xs">
+            </div>
+            <textarea id="storyIdea" rows="3" placeholder="Konsep Dunia..." class="w-full p-2 input-dark text-xs"></textarea>
+            <div class="flex items-center justify-between p-2 bg-black/20 rounded-lg">
+                <span class="text-xs text-gray-400">JUMLAH BAB</span>
+                <input type="number" id="chapterCount" value="3" class="w-12 bg-transparent text-center gold-text font-bold text-lg">
+            </div>
+            <button onclick="planNovel()" class="w-full py-3 gold-bg text-black font-black text-xs rounded-xl uppercase">Rancang Alur</button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 pb-10">
+            <button onclick="downloadFull('txt')" class="py-2 bg-gray-800 text-[9px] font-bold rounded-lg">FULL TXT</button>
+            <button onclick="downloadFull('html')" class="py-2 border border-yellow-700 gold-text text-[9px] font-bold rounded-lg">FULL HTML</button>
+            <button onclick="clearAllData()" class="col-span-2 py-1 text-[8px] text-red-900 font-bold uppercase mt-2">Hapus Draf</button>
+        </div>
+    </div>
+
+    <div class="flex-1 h-screen overflow-y-auto p-6 md:p-12">
+        <div id="mainPlaceholder" class="h-full flex items-center justify-center text-center opacity-20">
+            <h2 class="text-5xl font-black gold-text italic">READY TO WRITE</h2>
+        </div>
+        <div id="novelWorkspace" class="hidden space-y-12 max-w-4xl mx-auto pb-20">
+            <h2 id="displayTitle" class="text-5xl font-black gold-text novel-font text-center italic"></h2>
+            <div id="chaptersArea" class="space-y-10"></div>
+        </div>
+    </div>
+
+    <script>
+        // SEMUA LOGIKA JS DI SINI AGAR TIDAK SALAH PANGGIL
+        const getEl = id => document.getElementById(id);
+        let timerInterval, abortController;
+
+        function showPopup(msg) {
+            let sec = 0; getEl('popupTimer').innerText = "0s";
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => { sec++; getEl('popupTimer').innerText = sec + "s"; }, 1000);
+            getEl('aiPopup').classList.remove('hidden');
+            getEl('popupStatus').innerText = msg;
+        }
+        function hidePopup() { getEl('aiPopup').classList.add('hidden'); clearInterval(timerInterval); }
+        window.cancelProcess = () => { if(abortController) abortController.abort(); hidePopup(); };
+
+        async function checkEngine(num) {
+            const key = getEl(`apiKey${num}`).value.trim();
+            if(!key) return alert("Masukkan API Key!");
+            showPopup(`Koneksi Engine ${num}...`);
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+                const data = await res.json();
+                if(data.models) {
+                    const sel = getEl(`modelSelect${num}`);
+                    const btn = getEl(`btnCheck${num}`);
+                    const mods = data.models.filter(m => m.supportedGenerationMethods.includes('generateContent'));
+                    sel.innerHTML = mods.map(m => `<option value="${m.name}">${m.displayName.replace("Gemini ","")}</option>`).join('');
+                    sel.classList.remove('hidden');
+                    btn.innerText = `ENGINE ${num} AKTIF ✓`;
+                    btn.style.background = num === 1 ? "#064e3b" : "#1e3a8a";
+                    saveDraft();
+                } else { alert("Key Salah."); }
+            } catch (e) { alert("Koneksi Gagal."); }
+            finally { hidePopup(); }
+        }
+
+        async function callAI(num, prompt) {
+            const key = getEl(`apiKey${num}`).value;
+            const model = getEl(`modelSelect${num}`).value;
+            abortController = new AbortController();
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${key}`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                signal: abortController.signal,
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.85, maxOutputTokens: 8192 } })
+            });
+            const d = await res.json();
+            return d.candidates[0].content.parts[0].text.replace(/^.*?(Berikut|Tentu|Halo|Baiklah).*?(\n|:)/gi, '').trim();
+        }
+
+        async function planNovel() {
+            const idea = getEl('storyIdea').value;
+            if(!idea) return alert("Isi Konsep!");
+            showPopup("Engine 2 Merancang Alur...");
+            try {
+                const c = getEl('chapterCount').value;
+                const p = `Buat alur novel JSON murni: [{"label":"Prolog","judul":"...","ringkasan":"..."},{"label":"Bab 1","judul":"...","ringkasan":"..."},{"label":"Epilog","judul":"...","ringkasan":"..."}]. Total bab tengah ${c}. Konsep: ${idea}`;
+                const raw = await callAI(2, p);
+                const json = raw.substring(raw.indexOf('['), raw.lastIndexOf(']') + 1);
+                renderWorkspace(JSON.parse(json), getEl('novelTitle').value);
+                saveDraft();
+            } catch (e) { alert("Gagal Rancang."); }
+            finally { hidePopup(); }
+        }
+
+        async function writeChapter(i) {
+            const ls = document.querySelectorAll('.ch-label'), ts = document.querySelectorAll('.ch-title-input'), 
+                  ss = document.querySelectorAll('.ch-summary-input'), bs = document.querySelectorAll('.ch-bridge-input'),
+                  cs = document.querySelectorAll('.ch-content-input');
+            
+            showPopup(`Engine 1 Menulis ${ls[i].innerText}...`);
+            let prevTail = (i > 0 && cs[i-1].value) ? `AKHIR BAB SEBELUMNYA: ...${cs[i-1].value.slice(-1000)}\n` : "Awal cerita.\n";
+            const p = `Tulis narasi untuk ${ls[i].innerText}: ${ts[i].value}.\n${prevTail}\nMEMORI: ${i > 0 ? bs[i-1].value : "Awal."}\nALUR: ${ss[i].value}\nGenre: ${getEl('genre').value}. Minimal 1500 kata. SAMBUNGKAN NARASI SEBELUMNYA TANPA MENGULANG PENDAHULUAN.`;
+
+            try {
+                const res = await callAI(1, p);
+                cs[i].value = res;
+                saveDraft();
+                showPopup("Engine 2 Meringkas Memori...");
+                const br = await callAI(2, `Ringkas kejadian kunci untuk bab selanjutnya: ${res.substring(0, 2500)}`);
+                bs[i].value = br;
+                saveDraft();
+            } catch (e) { alert("Error."); }
+            finally { hidePopup(); }
+        }
+
+        function renderWorkspace(plan, title) {
+            getEl('mainPlaceholder').classList.add('hidden');
+            getEl('displayTitle').innerText = title || "Novel Tanpa Judul";
+            getEl('novelWorkspace').classList.remove('hidden');
+            getEl('chaptersArea').innerHTML = plan.map((item, i) => `
+                <div class="chapter-card bg-[#111] p-6 rounded-3xl border border-gray-900 shadow-xl">
+                    <div class="flex justify-between items-center border-b border-gray-800 pb-4 mb-4">
+                        <div class="flex-1">
+                            <span class="ch-label text-[9px] gold-text font-black uppercase">${item.label}</span>
+                            <input type="text" class="ch-title-input w-full text-xl font-bold bg-transparent text-white novel-font outline-none" value="${item.judul}" oninput="saveDraft()">
+                        </div>
+                        <button onclick="writeChapter(${i})" class="bg-white text-black px-8 py-2 rounded-full text-[10px] font-black hover:bg-yellow-500">TULIS BAB</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <textarea class="ch-summary-input summary-box" rows="3" oninput="saveDraft()">${item.summary || item.ringkasan}</textarea>
+                        <textarea class="ch-bridge-input bridge-box" rows="3" oninput="saveDraft()">${item.bridge || ""}</textarea>
+                    </div>
+                    <textarea class="ch-content-input content-box mt-4" rows="18" placeholder="Narasi..." oninput="saveDraft()">${item.content || ""}</textarea>
+                </div>
+            `).join('');
+        }
+
+        function saveDraft() {
+            const chapters = [];
+            document.querySelectorAll('.chapter-card').forEach(card => {
+                chapters.push({
+                    label: card.querySelector('.ch-label').innerText,
+                    judul: card.querySelector('.ch-title-input').value,
+                    summary: card.querySelector('.ch-summary-input').value,
+                    bridge: card.querySelector('.ch-bridge-input').value,
+                    content: card.querySelector('.ch-content-input').value
+                });
+            });
+            localStorage.setItem('tebe_v15_final', JSON.stringify({
+                k1: getEl('apiKey1').value, k2: getEl('apiKey2').value,
+                t: getEl('novelTitle').value, g: getEl('genre').value,
+                s: getEl('style').value, i: getEl('storyIdea').value,
+                c: getEl('chapterCount').value, vis: !getEl('novelWorkspace').classList.contains('hidden'),
+                ch: chapters
+            }));
+        }
+
+        window.onload = () => {
+            const saved = localStorage.getItem('tebe_v15_final');
+            if(!saved) return;
+            const d = JSON.parse(saved);
+            getEl('apiKey1').value = d.k1||""; getEl('apiKey2').value = d.k2||"";
+            getEl('novelTitle').value = d.t||""; getEl('genre').value = d.g||"";
+            getEl('style').value = d.s||""; getEl('storyIdea').value = d.i||"";
+            getEl('chapterCount').value = d.c||3;
+            if(d.k1) checkEngine(1); if(d.k2) checkEngine(2);
+            if(d.vis) renderWorkspace(d.ch, d.t);
+        };
+
+        function downloadFull(format) {
+            const title = getEl('novelTitle').value || 'Novel';
+            let res = format === 'html' ? `<html><body style="font-family:serif; padding:50px; background:#f4ece0;"><h1>${title}</h1>` : "";
+            document.querySelectorAll('.chapter-card').forEach(card => {
+                const l = card.querySelector('.ch-label').innerText, t = card.querySelector('.ch-title-input').value, c = card.querySelector('.ch-content-input').value;
+                if(format === 'html') res += `<h2>${l}: ${t}</h2><p style="white-space:pre-wrap;">${c}</p>`;
+                else res += `\n\n--- ${l}: ${t} ---\n\n${c}`;
+            });
+            const b = new Blob([res], { type: format === 'html' ? 'text/html' : 'text/plain' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `${title}.${format}`; a.click();
+        }
+        function clearAllData() { if(confirm("Hapus draf?")) { localStorage.clear(); location.reload(); } }
+    </script>
+</body>
+</html>
+
