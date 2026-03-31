@@ -192,3 +192,65 @@ window.onload = () => {
 };
 
 window.clearAllData = () => { if(confirm("Hapus draf?")) { localStorage.clear(); location.reload(); } };
+
+// --- SISTEM EKSPOR & DOWNLOAD (FIXED) ---
+
+const getHtmlHeader = (title) => `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>
+    @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@700;900&display=swap');
+    body { background:#f4ece0; color:#2c2c2c; font-family:'Crimson Pro',serif; line-height:1.8; margin:0; padding:0; text-align:justify; }
+    .page { max-width: 95%; margin: 10px auto; background: white; padding: 25px; box-shadow: 0 0 10px rgba(0,0,0,0.05); border-radius: 5px; border: 1px solid #ddd; }
+    @media (min-width: 768px) { .page { max-width: 800px; padding: 60px 80px; margin: 40px auto; } }
+    h1 { font-family:'Cinzel',serif; text-align:center; color:#8b6b23; font-size: 3rem; margin: 40px 0; }
+    h2 { font-family:'Cinzel',serif; text-align:center; color:#8b6b23; font-size: 2rem; border-bottom: 2px double #eee; padding-bottom: 10px; margin-top: 50px; }
+    p { margin-bottom: 1.5rem; text-indent: 3.5rem; font-size: 1.3rem; }
+    .cover { height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 10px double #8b6b23; margin: 15px; background:white; }
+</style></head><body>`;
+
+window.downloadSingle = function(i, format) {
+    const card = document.querySelectorAll('.chapter-card')[i];
+    const t = card.querySelector('.ch-title-input').value;
+    const l = card.querySelector('.ch-label').innerText;
+    const c = card.querySelector('.ch-content-input').value;
+    
+    let res = "";
+    if (format === 'html') {
+        res = `${getHtmlHeader(t)}<div class="page"><h2>${l}: ${t}</h2>${c.split('\n').filter(p=>p.trim()!="").map(p=>`<p>${p.trim()}</p>`).join('')}</div></body></html>`;
+    } else {
+        res = `[ ${l} - ${t} ]\n\n${c}`;
+    }
+    
+    window.saveFile(res, `${l}_${t}.${format}`, format);
+};
+
+window.downloadFull = function(format) {
+    const title = getEl('novelTitle').value || 'Novel';
+    let res = "";
+    
+    if (format === 'html') {
+        res = `${getHtmlHeader(title)}<div class="cover"><h1>${title}</h1><p>Mahakarya Sastra Modern</p></div>`;
+        document.querySelectorAll('.chapter-card').forEach(card => {
+            const l = card.querySelector('.ch-label').innerText;
+            const t = card.querySelector('.ch-title-input').value;
+            const c = card.querySelector('.ch-content-input').value;
+            res += `<div class="page"><h2>${l}: ${t}</h2>${c.split('\n').filter(p=>p.trim()!="").map(p=>`<p>${p.trim()}</p>`).join('')}</div>`;
+        });
+        res += "</body></html>";
+    } else {
+        document.querySelectorAll('.chapter-card').forEach(card => {
+            const l = card.querySelector('.ch-label').innerText;
+            const t = card.querySelector('.ch-title-input').value;
+            const c = card.querySelector('.ch-content-input').value;
+            res += `\n\n--- ${l.toUpperCase()} : ${t.toUpperCase()} ---\n\n${c}`;
+        });
+    }
+    
+    window.saveFile(res, `${title}_Lengkap.${format}`, format);
+};
+
+window.saveFile = function(str, name, format) {
+    const blob = new Blob([str], { type: format === 'html' ? 'text/html' : 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+};
