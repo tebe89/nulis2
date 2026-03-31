@@ -1,0 +1,119 @@
+/* TEBE v15 - DUAL ENGINE STYLESHEET
+   Optimasi: Portrait Reading, Luxury Typography, & Dual Engine Indicators
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;700&display=swap');
+
+/* Reset & Base */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { 
+    background-color: #080808; 
+    color: #e0e0e0; 
+    font-family: 'Inter', sans-serif; 
+    overflow: hidden; 
+}
+
+/* Typography */
+.gold-text { color: #c5a059; font-family: 'Cinzel', serif; }
+.novel-font { font-family: 'Crimson Pro', serif; }
+
+/* Layout Containers */
+.sidebar { 
+    background-color: #0f0f0f; 
+    border-right: 1px solid #222; 
+    width: 320px; 
+    height: 100vh; 
+    overflow-y: auto; 
+    flex-shrink: 0; 
+    padding: 20px; 
+    scrollbar-width: none; 
+}
+.sidebar::-webkit-scrollbar { display: none; }
+
+.main-content { 
+    flex: 1; 
+    height: 100vh; 
+    overflow-y: auto; 
+    background-color: #050505; 
+    position: relative;
+    scrollbar-width: thin;
+    scrollbar-color: #222 transparent;
+}
+
+@media (max-width: 768px) { 
+    body { overflow: auto; } 
+    .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #222; } 
+    .main-content { height: auto; } 
+}
+
+/* Form Elements */
+.input-dark { 
+    background-color: #151515; 
+    border: 1px solid #282828; 
+    color: #fff; 
+    border-radius: 8px; 
+    outline: none; 
+    transition: all 0.3s;
+}
+.input-dark:focus { border-color: #c5a059; background-color: #1a1a1a; }
+
+.gold-bg { 
+    background: linear-gradient(135deg, #c5a059 0%, #8b6b23 100%); 
+    color: #000; 
+    transition: transform 0.2s, opacity 0.3s;
+}
+.gold-bg:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* Workspace Cards */
+.chapter-card { 
+    transition: all 0.4s ease;
+    animation: slideUp 0.5s ease-out;
+}
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.summary-box, .content-box, .bridge-box { 
+    font-family: 'Crimson Pro', serif; 
+    background-color: #121212; 
+    color: #d1d1d1; 
+    border: 1px solid #222;
+    padding: 18px; 
+    border-radius: 12px; 
+    width: 100%; 
+    outline: none;
+    line-height: 1.6;
+}
+
+.content-box { font-size: 1.2rem; }
+.summary-box { font-size: 1rem; border-left: 3px solid #333; }
+
+/* Memory Bridge Style - Spesial Engine 2 */
+.bridge-box { 
+    font-style: italic;
+    color: #60a5fa; /* Biru terang untuk Engine 2 */
+    border-left: 3px solid #2563eb;
+    background-color: #0f172a;
+}
+
+/* Popup & Loaders */
+.loader {
+    width: 35px; height: 35px;
+    border: 3px solid rgba(197, 160, 89, 0.1);
+    border-bottom-color: #c5a059;
+    border-radius: 50%;
+    display: inline-block;
+    animation: rotation 1s linear infinite;
+}
+@keyframes rotation { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }
+
+/* Footer Spacer */
+.sidebar-footer-spacer { height: 100px; }
+
+/* Custom Text Indent for Workspace Preview */
+.content-box::first-line {
+    font-weight: bold;
+    color: #c5a059;
+}
+
