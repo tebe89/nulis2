@@ -3,88 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>v15 MASTER ARCHITECT - Full Blueprint</title>
+    <title>v15 MASTER ARCHITECT - Single Engine Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Fira+Code:wght@400;500&display=swap');
         body { background-color: #080808; color: #d1d1d1; font-family: 'Inter', sans-serif; }
-        .input-dark { background: #111; border: 1px solid #222; color: #fff; border-radius: 12px; outline: none; }
-        .input-dark:focus { border-color: #3b82f6; }
+        .input-dark { background: #111; border: 1px solid #222; color: #fff; border-radius: 12px; outline: none; transition: 0.3s; }
+        .input-dark:focus { border-color: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
         .prompt-box { font-family: 'Fira Code', monospace; background: #000; color: #10b981; border: 1px solid #1a1a1a; font-size: 0.8rem; border-radius: 12px; white-space: pre-wrap; }
-        .master-card { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 24px; }
-        .blue-glow { box-shadow: 0 0 20px rgba(59, 130, 246, 0.1); }
+        .master-card { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 24px; transition: 0.4s; }
+        .blue-glow { box-shadow: 0 0 30px rgba(59, 130, 246, 0.05); }
         .btn-primary { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); transition: 0.3s; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4); }
+        .loader { width: 40px; height: 40px; border: 4px solid #1a1a1a; border-bottom-color: #3b82f6; border-radius: 50%; animation: rotation 1s linear infinite; }
+        @keyframes rotation { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-10">
+<body class="min-h-screen p-4 md:p-10 flex flex-col items-center">
 
-    <div id="loader" class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95">
-        <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p class="text-xs font-black tracking-widest text-blue-500 uppercase">Merancang Seluruh Alur Cerita...</p>
+    <div id="loader" class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 backdrop-blur-sm">
+        <div class="loader mb-4"></div>
+        <p class="text-xs font-black tracking-[0.3em] text-blue-500 uppercase text-center">Arsitek Sedang Menyusun<br>Seluruh Alur Cerita...</p>
     </div>
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-5xl w-full">
         <header class="text-center mb-10">
-            <h1 class="text-4xl font-black tracking-tighter text-white mb-2">v15 MASTER <span class="text-blue-600">ARCHITECT</span></h1>
-            <p class="text-gray-500 text-xs uppercase tracking-[0.3em]">One-Click Full Novel Blueprint</p>
+            <h1 class="text-5xl font-black tracking-tighter text-white mb-2 italic">v15 <span class="text-blue-600">ARCHITECT</span></h1>
+            <p class="text-gray-500 text-[10px] uppercase tracking-[0.4em] font-bold">The Blueprint Master Engine</p>
         </header>
 
-        <div class="master-card p-6 mb-10 blue-glow">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-4">
-                    <input type="password" id="apiKey" placeholder="Gemini API Key..." class="w-full p-3 input-dark text-xs">
-                    <input type="text" id="novelTitle" placeholder="Judul Novel" class="w-full p-3 input-dark text-sm font-bold">
-                    <div class="flex items-center justify-between p-3 bg-black rounded-xl border border-gray-900">
-                        <span class="text-[10px] font-bold text-gray-500 uppercase">Jumlah Bab</span>
-                        <input type="number" id="chCount" value="10" class="w-12 bg-transparent text-center text-blue-500 font-black text-xl">
+        <div class="master-card p-8 mb-10 blue-glow border border-gray-800">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="space-y-4 border-r border-gray-800/50 pr-0 lg:pr-8">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest">1. Koneksi Engine</label>
+                        <input type="password" id="apiKey" placeholder="Masukkan Gemini API Key..." class="w-full p-3 input-dark text-xs">
+                        <button onclick="window.checkApi()" id="btnCheck" class="w-full py-2 bg-gray-800 text-[10px] font-black rounded-lg uppercase tracking-widest hover:bg-gray-700 transition">Hubungkan API</button>
+                    </div>
+                    
+                    <div id="modelWrapper" class="hidden space-y-2 animate-pulse">
+                        <label class="text-[10px] font-black text-blue-500 uppercase tracking-widest">2. Pilih Model Arsitek</label>
+                        <select id="modelSelect" class="w-full p-3 input-dark text-xs font-bold text-blue-400"></select>
                     </div>
                 </div>
+
                 <div class="space-y-4">
-                    <textarea id="novelIdea" rows="5" placeholder="Jelaskan garis besar cerita, dunia, dan konflik utamanya..." class="w-full p-3 input-dark text-xs"></textarea>
-                    <button onclick="generateFullBlueprint()" class="w-full py-4 btn-primary text-white font-black text-xs rounded-xl uppercase tracking-widest">Rancang Seluruh Alur Sekarang</button>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest">3. Konsep Cerita</label>
+                        <input type="text" id="novelTitle" placeholder="Judul Novel" class="w-full p-3 input-dark text-sm font-bold">
+                        <textarea id="novelIdea" rows="4" placeholder="Jelaskan Ide Besar, Karakter, dan Dunia Cerita Anda..." class="w-full p-3 input-dark text-xs"></textarea>
+                    </div>
+
+                    <div class="flex items-center justify-between p-3 bg-black/40 rounded-xl border border-gray-900">
+                        <span class="text-[10px] font-black text-gray-500 uppercase">Target Bab</span>
+                        <input type="number" id="chCount" value="13" class="w-12 bg-transparent text-center text-blue-500 font-black text-2xl outline-none">
+                    </div>
+
+                    <button onclick="window.generateFullBlueprint()" class="w-full py-4 btn-primary text-white font-black text-xs rounded-xl uppercase tracking-widest">Generate Master Blueprint</button>
                 </div>
             </div>
         </div>
 
         <div id="resultArea" class="hidden space-y-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-black text-white italic">HASIL RANCANGAN PROMPT BERANTAI</h2>
-                <button onclick="downloadFullFile()" class="px-6 py-2 bg-emerald-600 text-white text-[10px] font-black rounded-full uppercase hover:bg-emerald-500 transition">Download Master File (.txt)</button>
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-[#111] p-4 rounded-2xl border border-gray-800">
+                <h2 class="text-sm font-black text-white italic uppercase tracking-widest">Hasil Rancangan Alur Berantai</h2>
+                <button onclick="window.downloadFullFile()" class="px-8 py-2.5 bg-emerald-600 text-white text-[10px] font-black rounded-full uppercase hover:bg-emerald-500 transition shadow-lg shadow-emerald-900/20">Download Master File (.txt)</button>
             </div>
             
-            <div id="blueprintContainer" class="space-y-8 pb-20">
+            <div id="blueprintContainer" class="space-y-8 pb-32">
                 </div>
         </div>
     </div>
 
     <script>
         const getEl = id => document.getElementById(id);
-        let currentFullData = "";
+        let timerInterval, currentFullData = "";
 
-        async function generateFullBlueprint() {
+        // --- 1. SINKRONISASI API & MODEL ---
+        window.checkApi = async function() {
             const key = getEl('apiKey').value.trim();
-            const title = getEl('novelTitle').value || "Novel Tanpa Judul";
+            if(!key) return alert("API Key Kosong!");
+            
+            getEl('btnCheck').innerText = "MENCOBA KONEKSI...";
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+                const data = await res.json();
+                
+                if(data.models) {
+                    const sel = getEl('modelSelect');
+                    const mods = data.models.filter(m => m.supportedGenerationMethods.includes('generateContent'));
+                    sel.innerHTML = mods.map(m => `<option value="${m.name}">${m.displayName.replace("Gemini ","")}</option>`).join('');
+                    
+                    getEl('modelWrapper').classList.remove('hidden');
+                    getEl('modelWrapper').classList.remove('animate-pulse');
+                    getEl('btnCheck').innerText = "ENGINE TERHUBUNG ✓";
+                    getEl('btnCheck').style.backgroundColor = "#064e3b";
+                    
+                    // Prioritaskan Flash agar cepat
+                    if (sel.querySelector('option[value*="flash"]')) {
+                        sel.value = sel.querySelector('option[value*="flash"]').value;
+                    }
+                } else {
+                    alert("API Key tidak valid.");
+                    getEl('btnCheck').innerText = "HUBUNGKAN API";
+                }
+            } catch (e) {
+                alert("Gagal koneksi. Cek internet.");
+                getEl('btnCheck').innerText = "HUBUNGKAN API";
+            }
+        }
+
+        // --- 2. GENERATOR MASTER BLUEPRINT ---
+        window.generateFullBlueprint = async function() {
+            const key = getEl('apiKey').value.trim();
+            const model = getEl('modelSelect').value;
+            const title = getEl('novelTitle').value || "Mahakarya Tanpa Judul";
             const idea = getEl('novelIdea').value;
             const count = getEl('chCount').value;
 
-            if(!key || !idea) return alert("API Key dan Ide Cerita harus diisi!");
+            if(!key || !model) return alert("Hubungkan API dan pilih Model dulu!");
+            if(!idea) return alert("Konsep cerita belum diisi!");
 
             getEl('loader').classList.remove('hidden');
+            let sec = 0;
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => { sec++; }, 1000);
 
-            const masterPrompt = `Anda adalah Arsitek Novel Senior. Tugas Anda adalah merancang alur lengkap dari awal sampai akhir agar cerita nyambung secara keseluruhan dan tidak tumpang tindih.
+            const masterPrompt = `Bertindaklah sebagai Arsitek Novel Profesional. Buatlah alur lengkap untuk sebuah buku agar ceritanya sinkron secara keseluruhan dan tidak tumpang tindih.
 
-            JUDUL: ${title}
-            IDE UTAMA: ${idea}
+            JUDUL BUKU: ${title}
+            KONSEP BESAR: ${idea}
             TOTAL: ${count} Bab.
 
-            OUTPUT WAJIB: Hasilkan dalam format JSON murni seperti ini:
-            [{"bab": 1, "judul": "...", "alur_singkat": "..."}, {"bab": 2, "judul": "...", "alur_singkat": "..."}]
+            TUGAS:
+            Hasilkan alur per bab dalam format JSON murni.
+            STRUKTUR JSON: [{"bab": 1, "judul": "...", "alur_singkat": "..."}, {"bab": 2, "judul": "...", "alur_singkat": "..."}]
 
-            PENTING: Pastikan plot tiap bab adalah kelanjutan logis dari bab sebelumnya. Hanya balas dengan kode JSON.`;
+            PENTING:
+            1. Pastikan setiap bab adalah kelanjutan langsung dari bab sebelumnya (Linear).
+            2. Berikan alur_singkat yang cukup detail (2-3 kalimat) agar menjadi panduan menulis yang kuat.
+            3. HANYA balas dengan kode JSON murni.`;
 
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${key}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: masterPrompt }] }] })
@@ -97,66 +158,79 @@
                 
                 renderBlueprint(chapters, title, idea);
             } catch (e) {
-                alert("Gagal merancang. Pastikan API Key benar.");
+                alert("AI Gagal merancang. Coba ganti model atau cek Key.");
                 console.error(e);
             } finally {
                 getEl('loader').classList.add('hidden');
+                clearInterval(timerInterval);
             }
         }
 
+        // --- 3. RENDER HASIL & WRAPPING ---
         function renderBlueprint(chapters, title, idea) {
             getEl('resultArea').classList.remove('hidden');
             const container = getEl('blueprintContainer');
             container.innerHTML = "";
-            currentFullData = `MASTER BLUEPRINT: ${title}\nKONSEP: ${idea}\n\n`;
+            currentFullData = `MASTER BLUEPRINT NOVEL: ${title.toUpperCase()}\nKONSEP DUNIA: ${idea}\n==========================================\n\n`;
 
             chapters.forEach((ch) => {
                 const promptWrapped = `[PERINTAH PENULISAN CLEAN - BAB ${ch.bab}]
-Judul Bab: ${ch.judul}
-Alur Singkat Bab Ini: ${ch.alur_singkat}
+JUDUL BAB: ${ch.judul}
+ALUR BAB INI: ${ch.alur_singkat}
 
 KONTEKS DUNIA: ${idea}
 
-INSTRUKSI:
-1. Tuliskan LANGSUNG narasi ceritanya tanpa salam pembuka atau penjelasan apapun.
-2. Cerita harus "CLEAN", langsung masuk ke paragraf narasi.
-3. Pastikan alur nyambung dengan kejadian sebelumnya secara linear.
-4. Gunakan gaya bahasa sastra yang mendalam. Target 1500-2000 kata.
+INSTRUKSI WAJIB:
+1. Tuliskan LANGSUNG narasi ceritanya. DILARANG memberikan salam pembuka, penjelasan, atau penutup.
+2. Cerita harus "CLEAN" (Hanya teks naskah).
+3. Pastikan alur nyambung dengan kejadian di bab sebelumnya secara linear.
+4. Gunakan gaya bahasa sastra mendalam. Target minimal 1500 kata.
+5. Gunakan EYD, tanda baca, dan spasi yang sempurna.
 
-(Mulai menulis narasi sekarang)`;
+(Mulai menulis narasi bab ini sekarang)`;
 
                 currentFullData += `--- PROMPT BAB ${ch.bab} ---\n${promptWrapped}\n\n`;
 
-                const section = document.createElement('div');
-                section.className = "master-card p-6 border-l-4 border-l-blue-600";
-                section.innerHTML = `
+                const card = document.createElement('div');
+                card.className = "master-card p-6 border-l-4 border-l-blue-600 animate-fadeIn";
+                card.innerHTML = `
                     <div class="flex justify-between items-start mb-4">
                         <div>
-                            <span class="text-[9px] font-black text-blue-500 uppercase tracking-widest">Bab ${ch.bab}</span>
-                            <h3 class="text-white font-bold text-lg">${ch.judul}</h3>
+                            <span class="text-[9px] font-black text-blue-500 uppercase tracking-[0.2em]">Bab ${ch.bab}</span>
+                            <h3 class="text-white font-bold text-xl italic novel-font">${ch.judul}</h3>
                         </div>
-                        <button onclick="copyText(\`prompt-${ch.bab}\`)" class="text-[9px] bg-gray-800 px-3 py-1 rounded text-gray-400 hover:text-white uppercase font-bold">Copy Prompt</button>
+                        <button onclick="copyToClip(\`text-${ch.bab}\`)" class="text-[10px] bg-white text-black px-4 py-1.5 rounded-full font-black uppercase hover:bg-blue-500 hover:text-white transition shadow-lg">Copy Prompt</button>
                     </div>
-                    <p class="text-xs text-gray-500 italic mb-4">${ch.alur_singkat}</p>
-                    <div id="prompt-${ch.bab}" class="prompt-box p-4 text-[11px] leading-relaxed">${promptWrapped}</div>
+                    <div class="bg-black/40 p-3 rounded-xl border border-gray-900 mb-4">
+                        <p class="text-[11px] text-gray-400 leading-relaxed italic">${ch.alur_singkat}</p>
+                    </div>
+                    <div id="text-${ch.bab}" class="prompt-box p-5 text-[11px] leading-relaxed select-all">${promptWrapped}</div>
                 `;
-                container.appendChild(section);
+                container.appendChild(card);
             });
+            // Scroll ke hasil
+            getEl('resultArea').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function copyText(id) {
+        // --- 4. UTILITIES ---
+        window.copyToClip = (id) => {
             const text = getEl(id).innerText;
             navigator.clipboard.writeText(text);
-            alert("Prompt Bab Berhasil Disalin!");
+            alert("Prompt Bab Berhasil Disalin ke Clipboard!");
         }
 
-        function downloadFullFile() {
+        window.downloadFullFile = () => {
             const blob = new Blob([currentFullData], { type: 'text/plain' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = `${getEl('novelTitle').value || 'Blueprint'}_Master_Prompt.txt`;
+            a.download = `Architect_Blueprint_${getEl('novelTitle').value || 'Novel'}.txt`;
             a.click();
         }
     </script>
+
+    <style>
+        .animate-fadeIn { animation: fadeIn 0.8s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </body>
 </html>
