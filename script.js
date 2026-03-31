@@ -1,46 +1,3 @@
-const getEl = id => document.getElementById(id);
-let timerInterval, abortController;
-
-// --- FUNGSI HUBUNGKAN (PASTIKAN NAMA INI SESUAI DENGAN HTML) ---
-window.checkEngine = async function(num) {
-    const keyInput = getEl(`apiKey${num}`);
-    const key = keyInput ? keyInput.value.trim() : "";
-    
-    if(!key) {
-        alert(`Masukkan API Key untuk Engine ${num}!`);
-        return;
-    }
-    
-    window.showPopup(`Mencoba Engine ${num}...`, num);
-    
-    try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
-        const data = await response.json();
-        
-        if (data.models) {
-            const select = getEl(`modelSelect${num}`);
-            const btn = getEl(`btnCheck${num}`);
-            
-            const mods = data.models.filter(m => m.supportedGenerationMethods.includes('generateContent'));
-            select.innerHTML = mods.map(m => `<option value="${m.name}">${m.displayName.replace("Gemini ","")}</option>`).join('');
-            
-            select.classList.remove('hidden');
-            btn.innerText = `ENGINE ${num} AKTIF ✓`;
-            btn.style.backgroundColor = num === 1 ? "#064e3b" : "#1e3a8a";
-            btn.style.color = "white";
-            
-            window.saveDraft();
-        } else {
-            alert(`API Key ${num} salah atau limit.`);
-        }
-    } catch (e) {
-        alert(`Gagal koneksi Engine ${num}. Cek internet.`);
-    } finally {
-        window.hidePopup();
-    }
-};
-
-// --- LOGIKA PENULISAN UTUH ---
 window.writeChapter = async (i) => {
     const ls = document.querySelectorAll('.ch-label'),
           ts = document.querySelectorAll('.ch-title-input'),
@@ -50,49 +7,46 @@ window.writeChapter = async (i) => {
     
     window.showPopup(`Engine 1 Menulis ${ls[i].innerText}...`, 1);
 
+    // --- LOGIKA PERBAIKAN ALUR (ANTI-TUMPANG TINDIH) ---
+    // Mengambil 1000 karakter terakhir dari bab sebelumnya agar narasi menyambung sempurna
     let previousTail = "";
     if (i > 0 && cs[i-1].value) {
-        previousTail = `\nAKHIR DARI BAB SEBELUMNYA (SAMBUNGKAN NARASI DARI TITIK INI):\n...${cs[i-1].value.slice(-1000)}\n`;
+        previousTail = `\n[SANGAT PENTING] AKHIR NARASI BAB SEBELUMNYA: 
+        "...${cs[i-1].value.slice(-1000)}"
+        INSTRUKSI: Sambungkan narasi bab ini tepat dari titik terakhir di atas tanpa jeda atau pengulangan.\n`;
     }
 
-    const writePrompt = `Anda penulis novel profesional. Tulis ${ls[i].innerText} agar menyambung sempurna.
-    JUDUL: ${getEl('novelTitle').value} | KONSEP: ${getEl('storyIdea').value}
+    const writePrompt = `Anda adalah penulis novel profesional. Tugas Anda adalah menulis ${ls[i].innerText} yang merupakan KELANJUTAN LANGSUNG dari cerita sebelumnya.
+
+    JUDUL NOVEL: ${getEl('novelTitle').value}
+    KONSEP DUNIA: ${getEl('storyIdea').value}
+    GAYA: ${getEl('style').value} | GENRE: ${getEl('genre').value}
+
     ${previousTail}
-    MEMORI: ${i > 0 ? bs[i-1].value : "Awal cerita."}
-    ALUR BAB INI: ${ss[i].value}
-    ATURAN: Kelanjutan langsung, jangan ulang perkenalan, minimal 1500 kata, gaya ${getEl('style').value}.`;
+    CATATAN MEMORI/LOGIKA: ${i > 0 ? bs[i-1].value : "Ini adalah awal cerita."}
+    ALUR YANG HARUS DITULIS DI BAB INI: ${ss[i].value}
+
+    PERATURAN KETAT AGAR CERITA TIDAK TUMPANG TINDIH:
+    1. JANGAN menjelaskan ulang latar belakang, sistem, atau perkenalan karakter yang sudah ada di bab sebelumnya.
+    2. JANGAN membuat kejadian yang mirip atau mengulang misi yang sudah disebutkan.
+    3. Mulailah narasi dengan aksi atau dialog, jangan mulai dengan deskripsi dunia yang membosankan.
+    4. Pastikan alur maju secara linear (tidak berputar-putar).
+    5. Tulis minimal 1500 kata dengan EYD dan tanda baca yang sempurna.`;
 
     try {
         const result = await callAI(1, writePrompt);
         cs[i].value = result;
         window.saveDraft();
 
+        // Engine 2 meringkas memori untuk membantu bab selanjutnya
         window.showPopup(`Engine 2 Mengunci Benang Merah...`, 2);
-        const brRes = await callAI(2, `Catat ringkasan kejadian kunci bab ini untuk bab depan: ${result.substring(0, 2000)}`);
-        bs[i].value = brRes;
+        const bridgePrompt = `Berdasarkan teks bab ini, buat catatan sejarah singkat agar bab depan tidak amnesia. 
+        Catat: Kejadian kunci, posisi terakhir karakter, dan status misi.
+        TEKS: ${result.substring(0, 3000)}`;
+        
+        const bridgeRes = await callAI(2, bridgePrompt);
+        bs[i].value = bridgeRes;
         window.saveDraft();
-    } catch (e) { alert("Gagal Menulis."); }
+    } catch (e) { if(e.name !== 'AbortError') alert("Error Penulisan."); }
     finally { window.hidePopup(); }
 };
-
-// --- FUNGSI PENDUKUNG ---
-async function callAI(num, prompt) {
-    const key = getEl(`apiKey${num}`).value;
-    const model = getEl(`modelSelect${num}`).value;
-    abortController = new AbortController();
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${key}`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        signal: abortController.signal,
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.8, maxOutputTokens: 8192 } })
-    });
-    const d = await res.json();
-    return d.candidates[0].content.parts[0].text.trim();
-}
-
-window.showPopup = (msg, engineNum) => {
-    getEl('aiPopup').classList.remove('hidden');
-    getEl('popupStatus').innerText = msg;
-};
-window.hidePopup = () => getEl('aiPopup').classList.add('hidden');
-
-// (Fungsi Lainnya seperti renderWorkspace, saveDraft, download tetap sama seperti sebelumnya)
