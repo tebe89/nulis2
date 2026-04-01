@@ -3,117 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>v15 MASTER ARCHITECT - Single Engine Edition</title>
+    <title>v15 MASTER ARCHITECT - Long Narrative Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Fira+Code:wght@400;500&display=swap');
         body { background-color: #080808; color: #d1d1d1; font-family: 'Inter', sans-serif; }
         .input-dark { background: #111; border: 1px solid #222; color: #fff; border-radius: 12px; outline: none; transition: 0.3s; }
         .input-dark:focus { border-color: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
-        .prompt-box { font-family: 'Fira Code', monospace; background: #000; color: #10b981; border: 1px solid #1a1a1a; font-size: 0.8rem; border-radius: 12px; white-space: pre-wrap; }
-        .master-card { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 24px; transition: 0.4s; }
+        .prompt-box { font-family: 'Fira Code', monospace; background: #000; color: #10b981; border: 1px solid #1a1a1a; font-size: 0.8rem; border-radius: 12px; white-space: pre-wrap; height: 250px; overflow-y: auto; }
+        .master-card { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 24px; }
         .blue-glow { box-shadow: 0 0 30px rgba(59, 130, 246, 0.05); }
         .btn-primary { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); transition: 0.3s; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4); }
         .loader { width: 40px; height: 40px; border: 4px solid #1a1a1a; border-bottom-color: #3b82f6; border-radius: 50%; animation: rotation 1s linear infinite; }
         @keyframes rotation { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f0f0f; }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
     </style>
 </head>
 <body class="min-h-screen p-4 md:p-10 flex flex-col items-center">
 
     <div id="loader" class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 backdrop-blur-sm">
         <div class="loader mb-4"></div>
-        <p class="text-xs font-black tracking-[0.3em] text-blue-500 uppercase text-center">Arsitek Sedang Menyusun<br>Seluruh Alur Cerita...</p>
+        <p class="text-xs font-black tracking-widest text-blue-500 uppercase text-center">Arsitek Sedang Menyusun<br>Strategi Narasi Panjang...</p>
     </div>
 
     <div class="max-w-5xl w-full">
         <header class="text-center mb-10">
             <h1 class="text-5xl font-black tracking-tighter text-white mb-2 italic">v15 <span class="text-blue-600">ARCHITECT</span></h1>
-            <p class="text-gray-500 text-[10px] uppercase tracking-[0.4em] font-bold">The Blueprint Master Engine</p>
+            <p class="text-gray-500 text-[10px] uppercase tracking-[0.4em] font-bold italic">High-Density Prompt Generator</p>
         </header>
 
         <div class="master-card p-8 mb-10 blue-glow border border-gray-800">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="space-y-4 border-r border-gray-800/50 pr-0 lg:pr-8">
+                <div class="space-y-4 pr-0 lg:pr-8 lg:border-r lg:border-gray-800/50">
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest">1. Koneksi Engine</label>
-                        <input type="password" id="apiKey" placeholder="Masukkan Gemini API Key..." class="w-full p-3 input-dark text-xs">
-                        <button onclick="window.checkApi()" id="btnCheck" class="w-full py-2 bg-gray-800 text-[10px] font-black rounded-lg uppercase tracking-widest hover:bg-gray-700 transition">Hubungkan API</button>
+                        <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Akses Engine</label>
+                        <input type="password" id="apiKey" placeholder="Input Gemini API Key..." class="w-full p-3 input-dark text-xs">
+                        <button onclick="window.checkApi()" id="btnCheck" class="w-full py-2 bg-gray-800 text-[10px] font-black rounded-lg uppercase hover:bg-gray-700 transition">Hubungkan API</button>
                     </div>
-                    
-                    <div id="modelWrapper" class="hidden space-y-2 animate-pulse">
-                        <label class="text-[10px] font-black text-blue-500 uppercase tracking-widest">2. Pilih Model Arsitek</label>
+                    <div id="modelWrapper" class="hidden space-y-2">
+                        <label class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Pilih Model Arsitek</label>
                         <select id="modelSelect" class="w-full p-3 input-dark text-xs font-bold text-blue-400"></select>
                     </div>
                 </div>
 
                 <div class="space-y-4">
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest">3. Konsep Cerita</label>
-                        <input type="text" id="novelTitle" placeholder="Judul Novel" class="w-full p-3 input-dark text-sm font-bold">
-                        <textarea id="novelIdea" rows="4" placeholder="Jelaskan Ide Besar, Karakter, dan Dunia Cerita Anda..." class="w-full p-3 input-dark text-xs"></textarea>
-                    </div>
-
+                    <input type="text" id="novelTitle" placeholder="Judul Novel" class="w-full p-3 input-dark text-sm font-bold">
+                    <textarea id="novelIdea" rows="3" placeholder="Konsep Besar (Dunia, Aturan Sistem, Konflik)..." class="w-full p-3 input-dark text-xs"></textarea>
                     <div class="flex items-center justify-between p-3 bg-black/40 rounded-xl border border-gray-900">
-                        <span class="text-[10px] font-black text-gray-500 uppercase">Target Bab</span>
+                        <span class="text-[10px] font-black text-gray-500 uppercase">Total Rencana Bab</span>
                         <input type="number" id="chCount" value="13" class="w-12 bg-transparent text-center text-blue-500 font-black text-2xl outline-none">
                     </div>
-
-                    <button onclick="window.generateFullBlueprint()" class="w-full py-4 btn-primary text-white font-black text-xs rounded-xl uppercase tracking-widest">Generate Master Blueprint</button>
+                    <button onclick="window.generateFullBlueprint()" class="w-full py-4 btn-primary text-white font-black text-xs rounded-xl uppercase tracking-widest">Rancang Alur & Prompt Master</button>
                 </div>
             </div>
         </div>
 
         <div id="resultArea" class="hidden space-y-6">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-[#111] p-4 rounded-2xl border border-gray-800">
-                <h2 class="text-sm font-black text-white italic uppercase tracking-widest">Hasil Rancangan Alur Berantai</h2>
-                <button onclick="window.downloadFullFile()" class="px-8 py-2.5 bg-emerald-600 text-white text-[10px] font-black rounded-full uppercase hover:bg-emerald-500 transition shadow-lg shadow-emerald-900/20">Download Master File (.txt)</button>
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-[#111] p-5 rounded-3xl border border-gray-800">
+                <h2 class="text-xs font-black text-white italic uppercase tracking-[0.2em]">Blueprint Narasi Panjang Berhasil Dibuat</h2>
+                <button onclick="window.downloadFullFile()" class="px-8 py-3 bg-emerald-600 text-white text-[11px] font-black rounded-full uppercase hover:bg-emerald-500 transition shadow-lg shadow-emerald-900/20">
+                    UNDUH MASTER PROMPT (.TXT)
+                </button>
             </div>
             
-            <div id="blueprintContainer" class="space-y-8 pb-32">
-                </div>
+            <div id="blueprintContainer" class="space-y-8 pb-32"></div>
         </div>
     </div>
 
     <script>
         const getEl = id => document.getElementById(id);
-        let timerInterval, currentFullData = "";
+        let masterBlueprintText = "";
 
-        // --- 1. SINKRONISASI API & MODEL ---
         window.checkApi = async function() {
             const key = getEl('apiKey').value.trim();
             if(!key) return alert("API Key Kosong!");
-            
-            getEl('btnCheck').innerText = "MENCOBA KONEKSI...";
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
                 const data = await res.json();
-                
                 if(data.models) {
                     const sel = getEl('modelSelect');
                     const mods = data.models.filter(m => m.supportedGenerationMethods.includes('generateContent'));
                     sel.innerHTML = mods.map(m => `<option value="${m.name}">${m.displayName.replace("Gemini ","")}</option>`).join('');
-                    
                     getEl('modelWrapper').classList.remove('hidden');
-                    getEl('modelWrapper').classList.remove('animate-pulse');
-                    getEl('btnCheck').innerText = "ENGINE TERHUBUNG ✓";
-                    getEl('btnCheck').style.backgroundColor = "#064e3b";
-                    
-                    // Prioritaskan Flash agar cepat
-                    if (sel.querySelector('option[value*="flash"]')) {
-                        sel.value = sel.querySelector('option[value*="flash"]').value;
-                    }
-                } else {
-                    alert("API Key tidak valid.");
-                    getEl('btnCheck').innerText = "HUBUNGKAN API";
-                }
-            } catch (e) {
-                alert("Gagal koneksi. Cek internet.");
-                getEl('btnCheck').innerText = "HUBUNGKAN API";
-            }
+                    getEl('btnCheck').innerText = "ENGINE ONLINE ✓";
+                    getEl('btnCheck').classList.add('text-green-500');
+                } else { alert("Key Invalid."); }
+            } catch (e) { alert("Gagal koneksi."); }
         }
 
-        // --- 2. GENERATOR MASTER BLUEPRINT ---
         window.generateFullBlueprint = async function() {
             const key = getEl('apiKey').value.trim();
             const model = getEl('modelSelect').value;
@@ -121,116 +101,102 @@
             const idea = getEl('novelIdea').value;
             const count = getEl('chCount').value;
 
-            if(!key || !model) return alert("Hubungkan API dan pilih Model dulu!");
-            if(!idea) return alert("Konsep cerita belum diisi!");
+            if(!key || !model || !idea) return alert("Lengkapi API Key dan Konsep Cerita!");
 
             getEl('loader').classList.remove('hidden');
-            let sec = 0;
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => { sec++; }, 1000);
 
-            const masterPrompt = `Bertindaklah sebagai Arsitek Novel Profesional. Buatlah alur lengkap untuk sebuah buku agar ceritanya sinkron secara keseluruhan dan tidak tumpang tindih.
-
-            JUDUL BUKU: ${title}
-            KONSEP BESAR: ${idea}
-            TOTAL: ${count} Bab.
-
-            TUGAS:
-            Hasilkan alur per bab dalam format JSON murni.
-            STRUKTUR JSON: [{"bab": 1, "judul": "...", "alur_singkat": "..."}, {"bab": 2, "judul": "...", "alur_singkat": "..."}]
-
-            PENTING:
-            1. Pastikan setiap bab adalah kelanjutan langsung dari bab sebelumnya (Linear).
-            2. Berikan alur_singkat yang cukup detail (2-3 kalimat) agar menjadi panduan menulis yang kuat.
-            3. HANYA balas dengan kode JSON murni.`;
+            const prompt = `Anda adalah Arsitek Alur Novel Senior. Rancanglah alur lengkap bab demi bab secara detail agar cerita sinkron dan linear.
+            JUDUL: ${title}
+            KONSEP: ${idea}
+            JUMLAH: ${count} Bab.
+            OUTPUT: JSON Murni [{"bab": 1, "judul": "...", "alur_detail": "..."}, dst]. 
+            PENTING: Buat 'alur_detail' yang padat kejadian kunci (3-5 poin peristiwa).`;
 
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${key}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: masterPrompt }] }] })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
+                const d = await res.json();
+                const raw = d.candidates[0].content.parts[0].text;
+                const chapters = JSON.parse(raw.substring(raw.indexOf('['), raw.lastIndexOf(']') + 1));
                 
-                const data = await res.json();
-                const rawText = data.candidates[0].content.parts[0].text;
-                const jsonStr = rawText.substring(rawText.indexOf('['), rawText.lastIndexOf(']') + 1);
-                const chapters = JSON.parse(jsonStr);
-                
-                renderBlueprint(chapters, title, idea);
-            } catch (e) {
-                alert("AI Gagal merancang. Coba ganti model atau cek Key.");
+                renderResults(chapters, title, idea);
+            } catch (e) { 
                 console.error(e);
-            } finally {
-                getEl('loader').classList.add('hidden');
-                clearInterval(timerInterval);
-            }
+                alert("Gagal merancang alur. Coba ulangi atau cek koneksi."); 
+            } finally { getEl('loader').classList.add('hidden'); }
         }
 
-        // --- 3. RENDER HASIL & WRAPPING ---
-        function renderBlueprint(chapters, title, idea) {
+        function renderResults(chapters, title, idea) {
             getEl('resultArea').classList.remove('hidden');
             const container = getEl('blueprintContainer');
             container.innerHTML = "";
-            currentFullData = `MASTER BLUEPRINT NOVEL: ${title.toUpperCase()}\nKONSEP DUNIA: ${idea}\n==========================================\n\n`;
+
+            masterBlueprintText = `MASTER BLUEPRINT NOVEL: ${title.toUpperCase()}\n`;
+            masterBlueprintText += `KONSEP DUNIA: ${idea}\n`;
+            masterBlueprintText += `TOTAL: ${chapters.length} Bab\n`;
+            masterBlueprintText += `STATUS: POWER EXPANSION ENABLED\n`;
+            masterBlueprintText += `==========================================\n\n`;
 
             chapters.forEach((ch) => {
-                const promptWrapped = `[PERINTAH PENULISAN CLEAN - BAB ${ch.bab}]
-JUDUL BAB: ${ch.judul}
-ALUR BAB INI: ${ch.alur_singkat}
+                const powerPrompt = `[PERINTAH PENULISAN NARASI SANGAT DETAIL - BAB ${ch.bab}]
+Judul Bab: ${ch.judul}
+Alur Utama Bab Ini: ${ch.alur_detail}
 
-KONTEKS DUNIA: ${idea}
+KONSEP DUNIA & ATURAN: ${idea}
 
-INSTRUKSI WAJIB:
-1. Tuliskan LANGSUNG narasi ceritanya. DILARANG memberikan salam pembuka, penjelasan, atau penutup.
-2. Cerita harus "CLEAN" (Hanya teks naskah).
-3. Pastikan alur nyambung dengan kejadian di bab sebelumnya secara linear.
-4. Gunakan gaya bahasa sastra mendalam. Target minimal 1500 kata.
-5. Gunakan EYD, tanda baca, dan spasi yang sempurna.
+INSTRUKSI TEKNIS KHUSUS (DILARANG MERINGKAS):
+1. Tulis narasi LANGSUNG naskahnya. JANGAN berikan salam pembuka, penjelasan, atau ringkasan apapun.
+2. TARGET PANJANG: Minimal 1500-2000 kata per bab. JANGAN biarkan alur selesai terlalu cepat.
+3. EKSPANSI ADEGAN: Jika alur tertulis "Tokoh pergi ke pasar", kembangkan menjadi adegan panjang mulai dari persiapan, suasana perjalanan, detail keramaian pasar, aroma di udara, hingga monolog batin tokoh.
+4. TEKNIK SENSORIK: Fokus pada detail visual, suara, bau, dan sentuhan fisik. Gambarkan emosi tokoh melalui tindakan (Show, Don't Tell).
+5. DIALOG BERBOBOT: Masukkan dialog yang memperdalam karakter dan memajukan plot tanpa terburu-buru.
+6. KELANJUTAN LINEAR: Pastikan bab ini menyambung sempurna dengan logika bab sebelumnya.
+7. Cerita harus "CLEAN" (Hanya teks naskah novel).
 
-(Mulai menulis narasi bab ini sekarang)`;
+(Tuliskan narasi Bab ${ch.bab} yang sangat panjang dan deskriptif sekarang)`;
 
-                currentFullData += `--- PROMPT BAB ${ch.bab} ---\n${promptWrapped}\n\n`;
+                masterBlueprintText += `### BAB ${ch.bab}: ${ch.judul.toUpperCase()} ###\n`;
+                masterBlueprintText += `ALUR DETAIL: ${ch.alur_detail}\n\n`;
+                masterBlueprintText += `${powerPrompt}\n`;
+                masterBlueprintText += `\n--------------------------------------------------\n\n`;
 
                 const card = document.createElement('div');
-                card.className = "master-card p-6 border-l-4 border-l-blue-600 animate-fadeIn";
+                card.className = "master-card p-6 border-l-4 border-l-blue-600 mb-6 shadow-lg";
                 card.innerHTML = `
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <span class="text-[9px] font-black text-blue-500 uppercase tracking-[0.2em]">Bab ${ch.bab}</span>
-                            <h3 class="text-white font-bold text-xl italic novel-font">${ch.judul}</h3>
-                        </div>
-                        <button onclick="copyToClip(\`text-${ch.bab}\`)" class="text-[10px] bg-white text-black px-4 py-1.5 rounded-full font-black uppercase hover:bg-blue-500 hover:text-white transition shadow-lg">Copy Prompt</button>
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-white font-bold italic">Bab ${ch.bab}: ${ch.judul}</h3>
+                        <button onclick="copyToClip(this)" class="text-[9px] bg-blue-900 px-4 py-1.5 rounded-full uppercase font-black hover:bg-blue-600 transition">Copy Prompt</button>
                     </div>
-                    <div class="bg-black/40 p-3 rounded-xl border border-gray-900 mb-4">
-                        <p class="text-[11px] text-gray-400 leading-relaxed italic">${ch.alur_singkat}</p>
-                    </div>
-                    <div id="text-${ch.bab}" class="prompt-box p-5 text-[11px] leading-relaxed select-all">${promptWrapped}</div>
+                    <p class="text-[11px] text-gray-500 mb-4 leading-relaxed">${ch.alur_detail}</p>
+                    <div class="prompt-box p-4 text-[10px] leading-relaxed select-all border border-gray-900/50">${powerPrompt}</div>
                 `;
                 container.appendChild(card);
             });
-            // Scroll ke hasil
+
             getEl('resultArea').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // --- 4. UTILITIES ---
-        window.copyToClip = (id) => {
-            const text = getEl(id).innerText;
+        window.copyToClip = function(btn) {
+            const text = btn.parentElement.parentElement.querySelector('.prompt-box').innerText;
             navigator.clipboard.writeText(text);
-            alert("Prompt Bab Berhasil Disalin ke Clipboard!");
-        }
+            const original = btn.innerText;
+            btn.innerText = "COPIED!";
+            setTimeout(() => { btn.innerText = original; }, 2000);
+        };
 
-        window.downloadFullFile = () => {
-            const blob = new Blob([currentFullData], { type: 'text/plain' });
+        window.downloadFullFile = function() {
+            if(!masterBlueprintText) return alert("Belum ada data!");
+            const blob = new Blob([masterBlueprintText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `Architect_Blueprint_${getEl('novelTitle').value || 'Novel'}.txt`;
+            a.href = url;
+            a.download = `${getEl('novelTitle').value || 'Master_Blueprint'}_PowerPrompt.txt`;
             a.click();
-        }
+            URL.revokeObjectURL(url);
+        };
     </script>
-
-    <style>
-        .animate-fadeIn { animation: fadeIn 0.8s ease forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
 </body>
 </html>
