@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>v15 EVOLUTION - Serial Writer Pro</title>
+    <title>v15 EVOLUTION - Perfect Scroll</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;700;900&display=swap');
@@ -13,8 +13,8 @@
         /* Typography */
         .novel-editor { 
             font-family: 'Crimson Pro', serif; 
-            font-size: 1.3rem; 
-            line-height: 1.8; 
+            font-size: 1.35rem; 
+            line-height: 1.9; 
             background: #0a0a0a; 
             border: 1px solid #1a1a1a; 
             color: #e5e5e5; 
@@ -22,8 +22,9 @@
             border-radius: 24px; 
             width: 100%; 
             outline: none; 
-            min-height: 70vh;
+            min-height: 80vh;
             resize: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         /* Sidebar & Scrolling Logic */
@@ -36,14 +37,15 @@
         }
         .chapter-nav-area {
             flex-grow: 1;
-            overflow-y: auto; /* Mengaktifkan Scroll di Sidebar */
-            padding: 10px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            padding: 15px;
         }
         .sidebar-item { 
             transition: 0.2s; 
             cursor: pointer; 
-            border-left: 3px solid transparent; 
-            margin-bottom: 4px;
+            border-left: 4px solid transparent; 
+            margin-bottom: 6px;
         }
         .sidebar-item.active { 
             background: #111; 
@@ -51,21 +53,24 @@
             color: white; 
         }
 
-        /* Scrollbar Styling */
-        .custom-scroll::-webkit-scrollbar { width: 4px; }
-        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
+        /* Scrollbar Styling - Lebih Terlihat */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #050505; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; border: 1px solid #111; }
         .custom-scroll::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
 
-        .input-dark { background: #111; border: 1px solid #222; color: white; border-radius: 10px; padding: 10px; outline: none; width: 100%; transition: 0.3s; }
-        .input-dark:focus { border-color: #3b82f6; }
+        .input-dark { background: #111; border: 1px solid #222; color: white; border-radius: 12px; padding: 12px; outline: none; width: 100%; transition: 0.3s; }
+        .input-dark:focus { border-color: #3b82f6; background: #151515; }
         
         .btn-blue { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; font-weight: 900; }
-        .btn-blue:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-blue:hover { transform: translateY(-1px); filter: brightness(1.1); }
 
-        /* Loader Animation */
-        .loader { width: 40px; height: 40px; border: 4px solid #1a1a1a; border-bottom-color: #3b82f6; border-radius: 50%; animation: rotation 1s linear infinite; }
+        /* Loader */
+        .loader { width: 45px; height: 45px; border: 4px solid #1a1a1a; border-bottom-color: #3b82f6; border-radius: 50%; animation: rotation 1s linear infinite; }
         @keyframes rotation { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }
+
+        /* Spacer di bawah agar konten tidak terpotong */
+        .bottom-spacer { height: 150px; width: 100%; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
@@ -75,13 +80,13 @@
             <h1 class="text-xl font-black tracking-tighter text-blue-500 uppercase italic">v15 EVOLUTION</h1>
         </div>
         
-        <div class="p-4 space-y-4 border-b border-gray-900">
+        <div class="p-4 space-y-4 border-b border-gray-900 bg-black/20">
             <div class="space-y-1">
                 <label class="text-[9px] font-black text-gray-500 uppercase tracking-widest">Judul Utama Novel</label>
-                <input type="text" id="mainNovelTitle" placeholder="Misal: Takdir Sang Kaisar" class="input-dark text-xs font-bold" oninput="saveAll()">
+                <input type="text" id="mainNovelTitle" placeholder="Judul Mahakarya..." class="input-dark text-xs font-bold" oninput="saveAll()">
             </div>
             <div class="space-y-1">
-                <label class="text-[9px] font-black text-gray-500 uppercase tracking-widest">Gemini Engine Access</label>
+                <label class="text-[9px] font-black text-gray-500 uppercase tracking-widest">Engine Access</label>
                 <input type="password" id="apiKey" placeholder="Input API Key..." class="text-[10px] input-dark">
                 <button onclick="checkAPI()" id="apiStatus" class="w-full py-2 bg-gray-900 text-[9px] font-black rounded-lg uppercase border border-gray-800 transition">Cek Engine</button>
             </div>
@@ -90,44 +95,46 @@
         <div id="chapterList" class="chapter-nav-area custom-scroll">
             </div>
 
-        <div class="p-4 border-t border-gray-900 space-y-2 bg-[#080808]">
+        <div class="p-4 border-t border-gray-900 space-y-2 bg-[#080808] z-10">
             <button onclick="exportAll('txt')" class="w-full py-2 bg-gray-800 text-[10px] font-bold rounded-lg uppercase hover:bg-gray-700">Ekspor TXT</button>
-            <button onclick="exportAll('html')" class="w-full py-2 border border-blue-900 text-blue-500 text-[10px] font-bold rounded-lg uppercase hover:bg-blue-950/20">Ekspor HTML</button>
-            <button onclick="resetApp()" class="w-full py-1 text-[8px] text-red-900 font-bold uppercase mt-2">Hapus Seluruh Draf</button>
+            <button onclick="exportAll('html')" class="w-full py-2 border border-blue-900 text-blue-500 text-[10px] font-bold rounded-lg uppercase">Ekspor HTML</button>
+            <button onclick="resetApp()" class="w-full py-1 text-[8px] text-red-900 font-bold uppercase mt-2 opacity-50 hover:opacity-100">Hapus Draf</button>
         </div>
     </div>
 
     <div class="flex-1 flex flex-col h-screen relative">
-        <header class="h-16 border-b border-gray-900 flex items-center justify-between px-10 bg-black/50 backdrop-blur-md">
+        <header class="h-16 border-b border-gray-900 flex items-center justify-between px-10 bg-black/50 backdrop-blur-md z-10">
             <div class="flex items-center gap-6">
                 <span id="currentChapterLabel" class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Prolog</span>
-                <input type="text" id="currentChapterTitle" placeholder="Berikan Judul Bab..." class="bg-transparent border-none text-white font-black text-xl outline-none w-80" oninput="updateChapterData()">
+                <input type="text" id="currentChapterTitle" placeholder="Judul Bab..." class="bg-transparent border-none text-white font-black text-xl outline-none w-80" oninput="updateChapterData()">
             </div>
             <div class="flex gap-4">
-                <button onclick="writeChapter()" id="writeBtn" class="px-10 py-2.5 btn-blue rounded-full text-xs shadow-lg shadow-blue-900/20 uppercase tracking-widest">TULIS NARASI</button>
+                <button onclick="writeChapter()" id="writeBtn" class="px-10 py-2.5 btn-blue rounded-full text-xs shadow-lg uppercase tracking-widest">TULIS NARASI</button>
                 <button onclick="addNewChapter()" class="px-6 py-2 bg-white text-black font-black rounded-full text-[10px] uppercase hover:bg-blue-500 hover:text-white transition">Bab Baru +</button>
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto p-10 custom-scroll bg-[#050505]">
+        <main class="flex-1 overflow-y-auto p-10 custom-scroll bg-[#050505] scroll-smooth">
             <div class="max-w-4xl mx-auto space-y-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Konsep Dunia & Aturan Sistem</label>
-                        <textarea id="globalIdea" rows="3" class="text-xs input-dark" placeholder="Garis besar cerita, sistem kultivasi, latar belakang dunia..." oninput="saveAll()"></textarea>
+                        <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Konsep Dunia & Sistem</label>
+                        <textarea id="globalIdea" rows="3" class="text-xs input-dark" placeholder="Garis besar cerita..." oninput="saveAll()"></textarea>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black text-blue-500 uppercase tracking-widest italic">Tujuan Bab (Instruksi Narasi)</label>
-                        <textarea id="chapterInstruction" rows="3" class="text-xs input-dark border-blue-900/50" placeholder="Apa yang ingin dicapai di bab ini?" oninput="updateChapterData()"></textarea>
+                        <label class="text-[10px] font-black text-blue-500 uppercase tracking-widest italic">Tujuan Bab (Instruksi AI)</label>
+                        <textarea id="chapterInstruction" rows="3" class="text-xs input-dark border-blue-900/30" placeholder="Apa yang terjadi di bab ini?" oninput="updateChapterData()"></textarea>
                     </div>
                 </div>
 
-                <textarea id="mainContent" class="novel-editor custom-scroll" placeholder="Klik 'Tulis Narasi' untuk memulai bab ini..." oninput="updateChapterData()"></textarea>
+                <textarea id="mainContent" class="novel-editor" placeholder="Klik 'Tulis Narasi'..." oninput="updateChapterData()"></textarea>
                 
-                <div class="bg-[#0a0a0a] border border-gray-900 p-6 rounded-3xl">
-                    <label class="text-[10px] font-black text-blue-500 uppercase italic tracking-widest mb-2 block">Memory Bridge (Logika Estafet)</label>
-                    <div id="memoryBridge" class="text-xs text-gray-500 italic leading-relaxed">Belum ada memori yang tercatat untuk bab ini.</div>
+                <div class="bg-[#0a0a0a] border border-gray-900 p-8 rounded-3xl">
+                    <label class="text-[10px] font-black text-blue-500 uppercase italic tracking-widest mb-3 block">Memory Bridge (Logika Terakhir)</label>
+                    <div id="memoryBridge" class="text-xs text-gray-500 italic leading-relaxed">Belum ada memori.</div>
                 </div>
+
+                <div class="bottom-spacer"></div>
             </div>
         </main>
 
@@ -138,87 +145,56 @@
     </div>
 
     <script>
-        // PROLOG DEFAULT INSTRUCTION
-        const PROLOG_DEFAULT = "Perkenalkan karakter utama secara mendalam, jelaskan latar belakang dunianya, aturan sistem drama/kekuatan yang ia miliki, dan bagaimana konflik pertama kali muncul. Fokus pada detail sensorik, suasana, dan jangan meringkas alur.";
+        const PROLOG_DEFAULT = "Perkenalkan karakter utama secara mendalam, jelaskan latar belakang dunianya, aturan sistem kekuatan yang ia miliki, dan bagaimana konflik pertama kali muncul. Fokus pada detail sensorik dan suasana.";
         
-        let chapters = [{ 
-            label: "Prolog", 
-            title: "", 
-            content: "", 
-            bridge: "", 
-            instruction: PROLOG_DEFAULT 
-        }];
+        let chapters = [{ label: "Prolog", title: "", content: "", bridge: "", instruction: PROLOG_DEFAULT }];
         let activeIdx = 0;
-
         const getEl = id => document.getElementById(id);
 
-        // --- CORE AI LOGIC ---
         async function writeChapter() {
             const key = getEl('apiKey').value;
-            if(!key) return alert("API Key belum diisi!");
-
+            if(!key) return alert("API Key Kosong!");
             getEl('loader').classList.remove('hidden');
             getEl('loaderMsg').innerText = "Menyusun Narasi Panjang...";
 
-            // Menarik konteks dari bab sebelumnya (Estafet)
             let prevContext = "";
             if (activeIdx > 0) {
                 const prev = chapters[activeIdx - 1];
-                prevContext = `SITUASI TERAKHIR BAB SEBELUMNYA:
-                - Akhir Teks: "...${prev.content.slice(-1500)}"
-                - Memori Logika: ${prev.bridge}
-                INSTRUKSI: Sambungkan tepat dari titik ini secara linear dan organik.\n`;
+                prevContext = `SAMBUNGAN BAB SEBELUMNYA:\n- Akhir Teks: "...${prev.content.slice(-1500)}"\n- Memori: ${prev.bridge}\n`;
             }
 
-            const prompt = `BERTINDAKLAH SEBAGAI PENULIS NOVEL PROFESIONAL.
-            JUDUL NOVEL: ${getEl('mainNovelTitle').value}
-            DUNIA & SISTEM: ${getEl('globalIdea').value}
-            GAYA BAHASA: Sastra Mendalam, Deskriptif, Tanpa Basa-basi (Clean).
-            
+            const prompt = `PENULIS NOVEL PROFESIONAL.
+            JUDUL: ${getEl('mainNovelTitle').value} | DUNIA: ${getEl('globalIdea').value}
             ${prevContext}
-            TUJUAN BAB INI (${chapters[activeIdx].label}): ${getEl('chapterInstruction').value}
-            
-            ATURAN PENULISAN:
-            1. Tulis narasi LANGSUNG. Jangan menyapa pembaca atau memberikan penjelasan.
-            2. Minimal 1500-2000 kata. Ekspansi setiap adegan dengan detail sensorik (suara, bau, perasaan batin).
-            3. Jika ini Prolog, bangun pondasi karakter dan dunia yang kuat.
-            4. Jika ini Bab Lanjutan, pastikan alur menyambung sempurna tanpa mengulang perkenalan karakter yang sudah diketahui pembaca.
-            5. Gunakan teknik 'Show, Don't Tell'.`;
+            INSTRUKSI BAB (${chapters[activeIdx].label}): ${getEl('chapterInstruction').value}
+            ATURAN: Tulis narasi LANGSUNG naskah (min 1500 kata). Jangan meringkas. Gaya Sastra Deskriptif.`;
 
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
                 const d = await res.json();
                 const text = d.candidates[0].content.parts[0].text.trim();
-                
                 getEl('mainContent').value = text;
                 chapters[activeIdx].content = text;
 
-                // Auto Memory Bridge Generation
-                getEl('loaderMsg').innerText = "Meringkas Status Cerita...";
+                // Auto Bridge
                 const bRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: `Catat poin penting untuk kelanjutan bab (lokasi terakhir, status misi, item baru, emosi tokoh): ${text.substring(0, 3000)}` }] }] })
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: `Catat poin penting (lokasi, barang, status tokoh) dari bab ini: ${text.substring(0, 3000)}` }] }] })
                 });
                 const bd = await bRes.json();
                 const bridge = bd.candidates[0].content.parts[0].text.trim();
-                
                 chapters[activeIdx].bridge = bridge;
                 getEl('memoryBridge').innerText = bridge;
 
                 saveAll();
                 renderChapterList();
-            } catch (e) { 
-                alert("Terjadi kesalahan koneksi atau limit API."); 
-                console.error(e);
-            } finally { getEl('loader').classList.add('hidden'); }
+            } catch (e) { alert("Error API."); }
+            finally { getEl('loader').classList.add('hidden'); }
         }
 
-        // --- NAVIGATION & UI ---
         function addNewChapter() {
             const num = chapters.length;
             chapters.push({ label: `Bab ${num}`, title: "", content: "", bridge: "", instruction: "" });
@@ -232,7 +208,7 @@
             getEl('currentChapterTitle').value = ch.title;
             getEl('chapterInstruction').value = ch.instruction;
             getEl('mainContent').value = ch.content;
-            getEl('memoryBridge').innerText = ch.bridge || "Belum ada memori terdeteksi.";
+            getEl('memoryBridge').innerText = ch.bridge || "Belum ada memori.";
             renderChapterList();
         }
 
@@ -250,28 +226,23 @@
             chapters.forEach((ch, i) => {
                 const div = document.createElement('div');
                 div.className = `sidebar-item p-4 rounded-2xl ${i === activeIdx ? 'active' : 'text-gray-500 hover:bg-white/5'}`;
-                div.innerHTML = `
-                    <div class="text-[10px] font-black uppercase tracking-widest">${ch.label}</div>
-                    <div class="text-[9px] opacity-60 truncate font-bold mt-1">${ch.title || '(Tanpa Judul)'}</div>
-                `;
+                div.innerHTML = `<div class="text-[10px] font-black uppercase tracking-widest">${ch.label}</div><div class="text-[9px] opacity-60 truncate mt-1">${ch.title || '(Tanpa Judul)'}</div>`;
                 div.onclick = () => switchChapter(i);
                 container.appendChild(div);
             });
+            // TAMBAHKAN SPACER DI BAWAH SIDEBAR
+            const spacer = document.createElement('div');
+            spacer.style.height = "100px";
+            container.appendChild(spacer);
         }
 
-        // --- DATA & PERSISTENCE ---
         function saveAll() {
-            const data = { 
-                mainTitle: getEl('mainNovelTitle').value,
-                idea: getEl('globalIdea').value, 
-                chapters: chapters, 
-                key: getEl('apiKey').value 
-            };
-            localStorage.setItem('tebe_v15_evolution_v2', JSON.stringify(data));
+            const data = { mainTitle: getEl('mainNovelTitle').value, idea: getEl('globalIdea').value, chapters: chapters, key: getEl('apiKey').value };
+            localStorage.setItem('tebe_v15_evolution_final', JSON.stringify(data));
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem('tebe_v15_evolution_v2');
+            const saved = localStorage.getItem('tebe_v15_evolution_final');
             if(saved) {
                 const d = JSON.parse(saved);
                 getEl('mainNovelTitle').value = d.mainTitle || "";
@@ -279,47 +250,32 @@
                 getEl('apiKey').value = d.key || "";
                 chapters = d.chapters;
                 switchChapter(activeIdx);
-            } else { 
-                renderChapterList(); 
-            }
+            } else { renderChapterList(); }
         }
 
         function exportAll(format) {
-            const mainTitle = getEl('mainNovelTitle').value || "Novel_Mahakarya";
+            const mainTitle = getEl('mainNovelTitle').value || "Novel";
             let out = "";
             if(format === 'html') {
-                out = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{background:#f4ece0;padding:50px;font-family:serif;line-height:1.8;} .page{max-width:800px;margin:auto;background:white;padding:60px;box-shadow:0 0 10px rgba(0,0,0,0.1); border-radius:8px;} h1,h2{text-align:center;color:#8b6b23;} p{text-indent:3rem;margin-bottom:1.5rem;text-align:justify;}</style></head><body>`;
-                out += `<div class="page"><h1>${mainTitle}</h1><hr>`;
-                chapters.forEach(ch => {
-                    out += `<h2>${ch.label}: ${ch.title}</h2>${ch.content.split('\n').filter(p=>p.trim()!="").map(p=>`<p>${p.trim()}</p>`).join('')}<hr>`;
-                });
+                out = `<html><body style="background:#f4ece0;padding:50px;font-family:serif;line-height:1.8;"><div style="max-width:800px;margin:auto;background:white;padding:60px;border-radius:10px;"><h1>${mainTitle}</h1><hr>`;
+                chapters.forEach(ch => { out += `<h2>${ch.label}: ${ch.title}</h2><p style="white-space:pre-wrap;">${ch.content}</p><hr>`; });
                 out += `</div></body></html>`;
             } else {
-                out = `JUDUL NOVEL: ${mainTitle.toUpperCase()}\nKONSEP: ${getEl('globalIdea').value}\n\n`;
-                chapters.forEach(ch => {
-                    out += `\n\n--- ${ch.label.toUpperCase()}: ${ch.title.toUpperCase()} ---\n\n${ch.content}`;
-                });
+                out = `JUDUL: ${mainTitle.toUpperCase()}\n\n`;
+                chapters.forEach(ch => { out += `\n\n--- ${ch.label}: ${ch.title} ---\n\n${ch.content}`; });
             }
             const blob = new Blob([out], { type: format === 'html' ? 'text/html' : 'text/plain' });
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${mainTitle}.${format}`; a.click();
         }
 
-        function resetApp() { if(confirm("PERINGATAN: Ini akan menghapus seluruh naskah Anda. Lanjutkan?")) { localStorage.clear(); location.reload(); } }
-        
+        function resetApp() { if(confirm("Hapus seluruh naskah?")) { localStorage.clear(); location.reload(); } }
         async function checkAPI() { 
             const key = getEl('apiKey').value;
-            if(!key) return alert("Isi Key terlebih dahulu.");
-            getEl('apiStatus').innerText = "MENCOBA KONEKSI...";
+            getEl('apiStatus').innerText = "Koneksi...";
             try { 
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
-                if(res.ok) { 
-                    getEl('apiStatus').innerText = "ENGINE ONLINE ✓"; 
-                    getEl('apiStatus').style.color = "#3b82f6";
-                } else {
-                    alert("API Key tidak valid.");
-                    getEl('apiStatus').innerText = "CEK ENGINE";
-                }
-            } catch(e) { alert("Gagal terhubung."); }
+                if(res.ok) { getEl('apiStatus').innerText = "ONLINE ✓"; getEl('apiStatus').style.color = "#3b82f6"; }
+            } catch(e) { alert("Gagal."); }
         }
     </script>
 </body>
