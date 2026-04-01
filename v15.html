@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>v16.1 STREAM - Luxury Reader (Bang Tebe)</title>
+    <title>v16.5 STREAM - Tebe Unstoppable</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;700;900&display=swap');
@@ -15,54 +15,47 @@
             grid-template-columns: 280px 1fr; 
             grid-template-rows: auto 1fr;
             height: 100vh; 
-            transition: 0.3s ease;
         }
 
+        /* SIDEBAR FIXED */
+        .sidebar { background: #080808; border-right: 1px solid #1a1a1a; display: flex; flex-direction: column; overflow: hidden; transition: 0.3s; }
         .sidebar-hidden { grid-template-columns: 0px 1fr; }
-
-        /* HEADER */
-        .top-nav { grid-column: 1 / -1; background: #0a0a0a; border-bottom: 1px solid #1a1a1a; display: flex; flex-direction: column; padding: 10px; gap: 8px; z-index: 100; }
-        .nav-row-1 { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-        .nav-row-2 { display: flex; align-items: center; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
-
-        /* SIDEBAR */
-        .sidebar { background: #080808; border-right: 1px solid #1a1a1a; display: flex; flex-direction: column; overflow: hidden; }
         .chapter-nav { flex: 1; overflow-y: auto; padding: 10px; }
 
-        /* STREAM CONTAINER */
-        .main-stream { overflow-y: auto; background: #050505; scroll-behavior: smooth; transition: background 0.4s; }
-        .stream-container { max-width: 950px; margin: 0 auto; padding: 20px 20px 200px 20px; transition: 0.4s; }
+        /* HEADER FIXED */
+        .top-nav { grid-column: 1 / -1; background: #0a0a0a; border-bottom: 1px solid #1a1a1a; display: flex; flex-direction: column; padding: 10px; gap: 8px; z-index: 100; }
+        .nav-row-1 { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+        .nav-row-2 { display: flex; align-items: center; gap: 8px; overflow-x: auto; padding-bottom: 5px; min-height: 40px; }
 
-        /* CHAPTER CARD (EDIT MODE) */
-        .chapter-card { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 20px; margin-bottom: 30px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        /* STREAM CONTAINER */
+        .main-stream { overflow-y: auto; background: #050505; scroll-behavior: smooth; }
+        .stream-container { max-width: 900px; margin: 0 auto; padding: 20px 20px 200px 20px; }
+
+        /* CHAPTER CARD */
+        .chapter-card { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 20px; margin-bottom: 30px; overflow: hidden; }
         .card-header { padding: 15px 20px; background: #0f0f0f; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: 1px solid #1a1a1a; }
         .card-body { padding: 25px; }
         .collapsed .card-body { display: none; }
 
+        /* EDITOR */
         .novel-editor { 
-            font-family: 'Crimson Pro', serif; font-size: 1.35rem; line-height: 1.9; 
-            background: #050505; color: #e5e5e5; padding: 25px; 
-            border-radius: 15px; border: 1px solid #1a1a1a; width: 100%; 
-            outline: none; min-height: 500px; resize: none;
+            font-family: 'Crimson Pro', serif; font-size: 1.35rem; line-height: 1.8; 
+            background: #050505; color: #e5e5e5; padding: 20px; 
+            border-radius: 12px; border: 1px solid #1a1a1a; width: 100%; 
+            outline: none; min-height: 450px; resize: none;
         }
 
-        /* --- LUXURY READER MODE --- */
-        .read-mode .main-stream { background: #d9cfb8; } /* Cream Agak Gelap */
-        .read-mode .stream-container { max-width: 1000px; padding: 60px 30px; }
-        .read-mode .chapter-card { background: transparent; border: none; box-shadow: none; margin-bottom: 60px; border-radius: 0; }
-        .read-mode .card-header, .read-mode .edit-tools { display: none !important; }
-        .read-mode .card-body { padding: 0; }
-        .read-mode .novel-editor { 
-            background: transparent; color: #2c241a; border: none; font-size: 1.5rem; 
-            line-height: 2.0; min-height: auto; text-align: justify; padding: 0; pointer-events: none;
-        }
-        .read-mode .novel-editor::placeholder { color: transparent; }
-        /* Judul Bab di Mode Baca */
-        .read-mode .reader-title { display: block; text-align: center; font-size: 2.5rem; color: #3a3020; margin-bottom: 40px; font-weight: 900; }
-        .edit-mode .reader-title { display: none; }
+        /* --- MODE BACA LUXURY --- */
+        .reading-active .main-stream { background: #d9cfb8 !important; }
+        .reading-active .top-nav, .reading-active .sidebar, .reading-active #floatingAction { background: #050505; } /* Tetap gelap navigasi */
+        .reading-active .chapter-card { background: transparent; border: none; box-shadow: none; margin-bottom: 80px; }
+        .reading-active .card-header, .reading-active .edit-tools { display: none !important; }
+        .reading-active .novel-editor { background: transparent; color: #2c241a; border: none; font-size: 1.55rem; line-height: 2.1; pointer-events: none; padding: 0; text-align: justify; }
+        .reading-active .reader-title { display: block; text-align: center; font-size: 2.8rem; color: #3a3020; margin-bottom: 50px; font-weight: 900; font-family: 'Crimson Pro', serif; }
+        .reader-title { display: none; }
 
-        /* UI ELEMENTS */
-        .btn-ui { padding: 8px 16px; font-size: 10px; font-weight: 900; text-transform: uppercase; border-radius: 8px; }
+        /* BUTTONS */
+        .btn-ui { padding: 8px 16px; font-size: 10px; font-weight: 900; text-transform: uppercase; border-radius: 8px; flex-shrink: 0; }
         .btn-blue { background: #2563eb; color: white; }
         .btn-outline { border: 1px solid #3b82f6; color: #3b82f6; }
         .btn-dark { background: #111; border: 1px solid #333; color: #999; }
@@ -70,9 +63,6 @@
         
         #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(150px); background: #10b981; color: white; padding: 12px 30px; border-radius: 50px; font-weight: 800; font-size: 10px; transition: 0.5s ease-out; z-index: 1000; }
         #toast.show { transform: translateX(-50%) translateY(0); }
-        
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
     </style>
 </head>
 <body class="edit-mode">
@@ -81,32 +71,32 @@
         <header class="top-nav">
             <div class="nav-row-1">
                 <div class="flex items-center gap-3">
-                    <button onclick="toggleSidebar()" class="btn-ui btn-dark" style="font-size: 18px; padding: 5px 15px;">☰</button>
-                    <h1 class="text-blue-500 font-black italic uppercase text-sm">v16.1 STREAM</h1>
+                    <button onclick="toggleSidebar()" class="btn-ui btn-dark" style="font-size: 18px;">☰</button>
+                    <h1 class="text-blue-500 font-black italic uppercase text-sm">v16.5 STREAM</h1>
                 </div>
                 <div class="flex gap-2">
                     <button onclick="setView('read')" id="btnRead" class="btn-ui btn-dark">BACA</button>
                     <button onclick="setView('edit')" id="btnEdit" class="btn-ui btn-outline">EDIT</button>
-                    <button onclick="exportAll()" class="btn-ui btn-blue">EKSPOR HTML</button>
+                    <button onclick="exportAll()" class="btn-ui btn-blue">EKSPOR</button>
                 </div>
             </div>
             
             <div id="configRow" class="nav-row-2">
-                <input type="text" id="mainNovelTitle" placeholder="Judul Novel..." class="input-dark w-40 font-bold" oninput="saveAll()">
-                <input type="password" id="apiKey" placeholder="Input API Key..." class="input-dark w-40">
-                <button onclick="fetchModels()" id="btnFetch" class="btn-ui btn-dark border border-gray-700">Hubungkan</button>
-                <select id="modelSelect" class="input-dark hidden border-blue-900 text-blue-400 font-bold" onchange="saveAll()"></select>
+                <input type="text" id="mainNovelTitle" placeholder="Judul Novel..." class="input-dark w-36 font-bold" oninput="saveData()">
+                <input type="password" id="apiKey" placeholder="API Key..." class="input-dark w-36">
+                <button onclick="fetchModels()" id="btnFetch" class="btn-ui btn-dark">Hubungkan</button>
+                <select id="modelSelect" class="input-dark hidden border-blue-900 text-blue-400 font-bold" onchange="saveData()"></select>
             </div>
         </header>
 
-        <aside class="sidebar">
-            <div class="p-4 border-b border-gray-900 text-[10px] font-black text-gray-600 uppercase tracking-widest">Navigasi</div>
+        <aside class="sidebar" id="sidebar">
+            <div class="p-4 border-b border-gray-900 text-[10px] font-black text-gray-500 uppercase tracking-widest">Navigasi Bab</div>
             <div id="chapterNav" class="chapter-nav"></div>
             
             <div class="p-4 border-t border-gray-900 bg-black/40">
-                <label class="text-[9px] font-black text-blue-500 uppercase block mb-2 tracking-widest italic">Memory Global (Benang Merah)</label>
-                <textarea id="globalIdea" class="input-dark w-full text-[10px] leading-relaxed" rows="10" placeholder="Fakta penting..." oninput="saveAll()"></textarea>
-                <button onclick="resetApp()" class="w-full mt-4 py-2 text-[8px] text-red-900 font-black uppercase opacity-40">Reset Semua Cerita</button>
+                <label class="text-[9px] font-black text-blue-500 uppercase block mb-2 italic">Memory Global (Benang Merah)</label>
+                <textarea id="globalIdea" class="input-dark w-full text-[10px]" rows="10" placeholder="Ketik fakta penting di sini agar AI tidak lupa..." oninput="saveData()"></textarea>
+                <button onclick="resetApp()" class="w-full mt-4 py-2 text-[8px] text-red-900 font-black uppercase opacity-30">Reset Projek</button>
             </div>
         </aside>
 
@@ -114,8 +104,8 @@
             <div id="streamContainer" class="stream-container">
                 </div>
             
-            <div id="floatingAction" class="fixed bottom-8 left-0 right-0 flex justify-center gap-4 pointer-events-none">
-                <button onclick="prepareNextChapter()" class="pointer-events-auto px-12 py-4 bg-blue-600 text-white font-black rounded-full text-[11px] uppercase shadow-2xl tracking-widest hover:scale-105 transition">Siapkan Bab Selanjutnya ↓</button>
+            <div id="floatingAction" class="fixed bottom-8 left-0 right-0 flex justify-center pointer-events-none">
+                <button onclick="prepareNextChapter()" class="pointer-events-auto px-12 py-4 bg-blue-600 text-white font-black rounded-full text-[11px] uppercase shadow-2xl tracking-widest">Buat Bab Berikutnya ↓</button>
             </div>
         </main>
     </div>
@@ -123,6 +113,7 @@
     <div id="toast">BAB SELESAI, BANG TEBE! ✓</div>
 
     <script>
+        // DATA DASAR
         let chapters = [{ id: Date.now(), label: "Prolog", title: "Awal Segalanya", content: "", instruction: "Perkenalkan dunia dan tokoh utama secara mendalam.", collapsed: false }];
         let isWriting = false;
         let currentMode = 'edit';
@@ -132,7 +123,7 @@
 
         async function fetchModels() {
             const key = getEl('apiKey').value;
-            if(!key) return alert("Input API Key dulu, Bang!");
+            if(!key) return alert("Bang Tebe, isi API Key dulu!");
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
                 const data = await res.json();
@@ -142,20 +133,19 @@
                                         .map(m => `<option value="${m.name}">${m.displayName.replace("Gemini ","")}</option>`).join('');
                     sel.classList.remove('hidden');
                     getEl('btnFetch').classList.add('hidden');
-                    saveAll();
+                    saveData();
                 }
-            } catch (e) { alert("Key Gagal."); }
+            } catch (e) { alert("Gagal koneksi API."); }
         }
 
         function setView(mode) {
             currentMode = mode;
-            document.body.className = mode + '-mode';
             if(mode === 'read') {
+                document.body.classList.add('reading-active');
                 getEl('configRow').classList.add('hidden');
-                getEl('floatingAction').classList.add('hidden');
             } else {
+                document.body.classList.remove('reading-active');
                 getEl('configRow').classList.remove('hidden');
-                getEl('floatingAction').classList.remove('hidden');
             }
             getEl('btnRead').className = mode === 'read' ? 'btn-ui btn-blue' : 'btn-ui btn-dark';
             getEl('btnEdit').className = mode === 'edit' ? 'btn-ui btn-outline' : 'btn-ui btn-dark';
@@ -173,8 +163,8 @@
                 
                 card.innerHTML = `
                     <div class="card-header" onclick="toggleCollapse(${idx})">
-                        <span class="text-[10px] font-black text-blue-500 uppercase italic tracking-widest">${ch.label}: ${ch.title || 'Draft...'}</span>
-                        <span class="text-[9px] text-gray-600 font-bold">${ch.collapsed ? 'BUKA EDITOR' : 'LIPAT'}</span>
+                        <span class="text-[10px] font-black text-blue-500 uppercase italic tracking-widest">${ch.label}: ${ch.title || 'Draf...'}</span>
+                        <span class="text-[9px] text-gray-600 font-bold">${ch.collapsed ? 'BUKA' : 'LIPAT'}</span>
                     </div>
                     <div class="card-body">
                         <div class="reader-title">${ch.label}: ${ch.title}</div>
@@ -183,15 +173,15 @@
                                 class="bg-transparent border-b border-gray-800 text-white font-black text-2xl outline-none w-full pb-2"
                                 oninput="updateChapter(${idx}, 'title', this.value)">
                             <div class="space-y-2">
-                                <label class="text-[9px] font-black text-blue-600 uppercase tracking-widest italic">Alur Bab Ini</label>
-                                <textarea class="input-dark w-full leading-relaxed" rows="3" oninput="updateChapter(${idx}, 'instruction', this.value)">${ch.instruction}</textarea>
+                                <label class="text-[9px] font-black text-blue-600 uppercase tracking-widest italic">Instruksi Alur</label>
+                                <textarea class="input-dark w-full" rows="3" oninput="updateChapter(${idx}, 'instruction', this.value)">${ch.instruction}</textarea>
                             </div>
                             <div class="flex justify-end gap-3 pt-2">
-                                <button onclick="runWriting(${idx})" id="writeBtn-${idx}" class="px-10 py-3 bg-blue-600 text-white text-[10px] font-black rounded-full shadow-lg">BUAT NARASI</button>
+                                <button onclick="runWriting(${idx})" id="writeBtn-${ch.id}" class="px-10 py-3 bg-blue-600 text-white text-[10px] font-black rounded-full shadow-lg">BUAT NARASI</button>
                                 <button onclick="rebuildChapter(${idx})" class="px-6 py-3 border border-gray-800 text-[10px] text-gray-500 font-bold rounded-full">REVISI</button>
                             </div>
                         </div>
-                        <textarea class="novel-editor" placeholder="Narasi..." oninput="updateChapter(${idx}, 'content', this.value)">${ch.content}</textarea>
+                        <textarea class="novel-editor" placeholder="AI akan menulis di sini..." oninput="updateChapter(${idx}, 'content', this.value)">${ch.content}</textarea>
                     </div>
                 `;
                 container.appendChild(card);
@@ -202,12 +192,12 @@
         function toggleCollapse(idx) {
             chapters[idx].collapsed = !chapters[idx].collapsed;
             renderStream();
-            saveAll();
+            saveData();
         }
 
         function updateChapter(idx, field, value) {
             chapters[idx][field] = value;
-            saveAll();
+            saveData();
             if(field === 'title') renderNav();
         }
 
@@ -216,18 +206,17 @@
             const key = getEl('apiKey').value;
             const model = getEl('modelSelect').value;
             const idea = getEl('globalIdea').value;
-            if(!key || !model) return alert("Bang Tebe, Hubungkan API dulu!");
+            
+            if(!key || !model) return alert("Hubungkan API dulu, Bang!");
 
             isWriting = true;
-            const btn = getEl(`writeBtn-${idx}`);
+            const btn = getEl(`writeBtn-${chapters[idx].id}`);
             btn.innerText = "MENULIS..."; btn.disabled = true;
 
-            const toast = getEl('toast');
-            toast.innerText = "AI SEDANG MENULIS DI LATAR BELAKANG...";
-            toast.classList.add('show');
+            showToast("AI SEDANG MENULIS DI LATAR BELAKANG...");
 
             let prevText = idx > 0 ? `KONTEKS SEBELUMNYA: "...${chapters[idx-1].content.slice(-2000)}"\n` : "";
-            const prompt = `PENULIS NOVEL PROFESIONAL. MEMORY GLOBAL: ${idea}\n${prevText}BAB INI (${chapters[idx].label}): ${chapters[idx].instruction}\nATURAN: Tulis naskah narasi (min 1500 kata). Sangat detail, deskriptif, sambung langsung.`;
+            const prompt = `PENULIS NOVEL PROFESIONAL. MEMORY GLOBAL: ${idea}\n${prevText}BAB INI: ${chapters[idx].instruction}\nATURAN: Tulis narasi min 1500 kata. Sambung cerita secara alami.`;
 
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${key}`, {
@@ -240,38 +229,37 @@
                     renderStream();
                     showToast("BAB SELESAI, BANG TEBE! ✓");
                 }
-            } catch (e) { alert("API Error."); }
+            } catch (e) { console.error(e); }
             finally { isWriting = false; btn.innerText = "BUAT NARASI"; btn.disabled = false; }
         }
 
         async function prepareNextChapter() {
             const key = getEl('apiKey').value;
-            const model = getEl('modelSelect').value || "models/gemini-1.5-flash";
             const lastIdx = chapters.length - 1;
-            if(!chapters[lastIdx].content) return alert("Selesaikan narasi bab terakhir dulu!");
+            if(!key || !chapters[lastIdx].content) return alert("Selesaikan bab terakhir dulu!");
             
             chapters.forEach(c => c.collapsed = true);
-            const prompt = `Analisis bab ini: "${chapters[lastIdx].content.slice(-1500)}". Berikan instruksi alur singkat bab selanjutnya.`;
+            const prompt = `Analisis singkat bab ini: "${chapters[lastIdx].content.slice(-1500)}". Berikan satu instruksi alur bab selanjutnya.`;
+            
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${key}`, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
                 const d = await res.json();
-                const nextNum = chapters.length;
-                chapters.push({ id: Date.now(), label: `Bab ${nextNum}`, title: `Bab ${nextNum}`, content: "", instruction: d.candidates[0].content.parts[0].text.trim(), collapsed: false });
+                chapters.push({ id: Date.now(), label: `Bab ${chapters.length}`, title: `Bab ${chapters.length}`, content: "", instruction: d.candidates[0].content.parts[0].text.trim(), collapsed: false });
                 renderStream();
                 setTimeout(() => getEl(`card-${chapters[chapters.length-1].id}`).scrollIntoView({ behavior: 'smooth' }), 300);
-                saveAll();
-            } catch(e) { alert("Gagal."); }
+                saveData();
+            } catch(e) { alert("Gagal merancang bab."); }
         }
 
         function renderNav() {
             const nav = getEl('chapterNav'); nav.innerHTML = "";
             chapters.forEach((ch, i) => {
                 const div = document.createElement('div');
-                div.className = "sidebar-item";
-                div.innerHTML = `<b>${ch.label}</b><br><span class="opacity-50 truncate block text-[9px]">${ch.title}</span>`;
+                div.className = "p-3 mb-2 bg-[#0c0c0c] rounded-lg cursor-pointer hover:bg-[#111] text-[10px]";
+                div.innerHTML = `<b>${ch.label}</b><br><span class="opacity-50 truncate block">${ch.title}</span>`;
                 div.onclick = () => { getEl(`card-${ch.id}`).scrollIntoView({ behavior: 'smooth' }); if(ch.collapsed) toggleCollapse(i); };
                 nav.appendChild(div);
             });
@@ -282,36 +270,33 @@
             setTimeout(() => toast.classList.remove('show'), 4000);
         }
 
-        function saveAll() {
-            const data = { novelTitle: getEl('mainNovelTitle').value, idea: getEl('globalIdea').value, chapters, key: getEl('apiKey').value, model: getEl('modelSelect').value };
-            localStorage.setItem('v16_tebe_luxury_v1', JSON.stringify(data));
+        function saveData() {
+            const data = { title: getEl('mainNovelTitle').value, idea: getEl('globalIdea').value, chapters, key: getEl('apiKey').value, model: getEl('modelSelect').value };
+            localStorage.setItem('v16_5_tebe_final', JSON.stringify(data));
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem('v16_tebe_luxury_v1');
+            const saved = localStorage.getItem('v16_5_tebe_final');
             if(saved) {
                 const d = JSON.parse(saved);
-                getEl('mainNovelTitle').value = d.novelTitle || ""; getEl('globalIdea').value = d.idea || ""; getEl('apiKey').value = d.key || "";
+                getEl('mainNovelTitle').value = d.title || ""; getEl('globalIdea').value = d.idea || ""; getEl('apiKey').value = d.key || "";
                 chapters = d.chapters;
-                if(getEl('apiKey').value) fetchModels().then(() => { if(d.model) getEl('modelSelect').value = d.model; });
+                if(d.key) fetchModels().then(() => { if(d.model) getEl('modelSelect').value = d.model; });
             }
             renderStream();
         }
 
         function exportAll() {
             const mainTitle = getEl('mainNovelTitle').value || "Novel";
-            let out = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{background:#d9cfb8;padding:50px;font-family:serif;line-height:2.0;color:#2c241a;}.container{max-width:900px;margin:auto;background:#e4dccb;padding:60px;box-shadow:0 0 20px rgba(0,0,0,0.1);border-radius:4px;}h1,h2{text-align:center;color:#3a3020;margin-bottom:40px;}p{text-indent:3rem;margin-bottom:1.5rem;text-align:justify;}</style></head><body><div class="container"><h1>${mainTitle}</h1>`;
-            chapters.forEach(ch => { 
-                const cleanContent = ch.content.split('\n').filter(p=>p.trim()!="").map(p=>`<p>${p.trim()}</p>`).join('');
-                out += `<h2>${ch.label}: ${ch.title}</h2>${cleanContent}<hr style="border:none; border-top:1px solid #c4ba9f; margin:40px 0;">`; 
-            });
+            let out = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{background:#d9cfb8;padding:50px;font-family:serif;line-height:2.0;color:#2c241a;}.container{max-width:900px;margin:auto;padding:60px;}h1,h2{text-align:center;color:#3a3020;}p{text-indent:3rem;margin-bottom:1.5rem;text-align:justify;}</style></head><body><div class="container"><h1>${mainTitle}</h1>`;
+            chapters.forEach(ch => { out += `<h2>${ch.label}: ${ch.title}</h2>${ch.content.split('\n').map(p=>`<p>${p}</p>`).join('')}<hr>`; });
             out += `</div></body></html>`;
             const blob = new Blob([out], { type: 'text/html' });
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${mainTitle}.html`; a.click();
         }
 
-        function resetApp() { if(confirm("Hapus semua draf cerita?")) { localStorage.clear(); location.reload(); } }
-        function rebuildChapter(idx) { if(confirm("Buat ulang bab ini?")) runWriting(idx); }
+        function resetApp() { if(confirm("Hapus projek, Bang Tebe?")) { localStorage.clear(); location.reload(); } }
+        function rebuildChapter(idx) { if(confirm("Revisi bab ini?")) runWriting(idx); }
     </script>
 </body>
 </html>
