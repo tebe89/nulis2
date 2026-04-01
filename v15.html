@@ -3,81 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>v15 EVOLUTION - Mobile Fix</title>
+    <title>v15 EVOLUTION - Tablet Fix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;700;900&display=swap');
         
-        /* Reset Body agar tidak goyang di tablet/HP */
         html, body { height: 100vh; margin: 0; overflow: hidden; background-color: #050505; color: #d1d1d1; font-family: 'Inter', sans-serif; position: fixed; width: 100%; }
         
-        /* Layout Utama dengan Grid */
-        .app-grid { 
-            display: grid; 
-            grid-template-columns: 280px 1fr; 
-            height: 100vh; 
-            width: 100vw; 
-        }
+        /* Kontainer Utama */
+        .app-wrapper { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
 
-        /* SIDEBAR DENGAN GRID INTERNAL AGAR TOMBOL TIDAK HILANG */
+        /* SIDEBAR TOTAL REFORM */
         .sidebar { 
-            display: grid;
-            grid-template-rows: auto auto 1fr auto; /* Baris ke-3 (1fr) adalah area scroll */
+            width: 280px; 
+            flex-shrink: 0; 
+            height: 100vh;
+            display: flex; 
+            flex-direction: column; /* Mengatur susunan dari atas ke bawah */
             background: #080808; 
-            border-right: 1px solid #1a1a1a;
-            height: 100vh;
+            border-right: 1px solid #1a1a1a; 
         }
 
-        .header-sidebar { padding: 1.5rem; border-bottom: 1px solid #111; }
-        .config-sidebar { padding: 1rem; border-bottom: 1px solid #111; display: flex; flex-direction: column; gap: 0.75rem; }
+        .sb-header { flex-shrink: 0; padding: 1.5rem; border-bottom: 1px solid #111; }
+        .sb-config { flex-shrink: 0; padding: 1rem; border-bottom: 1px solid #111; display: flex; flex-direction: column; gap: 0.5rem; }
         
-        /* AREA INI YANG BISA DI-SCROLL */
-        .nav-scroll-area {
-            overflow-y: auto;
+        /* AREA SCROLL: Diberi flex-1 agar dia yang mengalah menciut */
+        .sb-nav-scroll {
+            flex: 1; 
+            overflow-y: auto; 
             padding: 0.75rem;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch; /* Biar scroll di tablet mulus */
-        }
-
-        /* AREA TOMBOL EKSPOR (FIXED DI BAWAH) */
-        .footer-sidebar { 
-            padding: 1rem; 
-            background: #0a0a0a; 
-            border-top: 1px solid #1a1a1a;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            padding-bottom: 2rem; /* Ruang extra untuk navigasi bar tablet */
-        }
-
-        /* MAIN CONTENT AREA */
-        .editor-grid {
-            display: grid;
-            grid-template-rows: 64px 1fr;
-            height: 100vh;
-            background: #050505;
-        }
-
-        .editor-scroll {
-            overflow-y: auto;
-            padding: 2rem;
+            min-height: 0; /* KUNCI: Agar flex child bisa scroll */
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Novel Styling */
-        .novel-editor { 
-            font-family: 'Crimson Pro', serif; font-size: 1.3rem; line-height: 1.8; background: #0a0a0a; border: 1px solid #1a1a1a; 
-            color: #e5e5e5; padding: 2rem; border-radius: 1.5rem; width: 100%; outline: none; min-height: 800px; resize: none;
+        /* FOOTER SIDEBAR: Dipaksa selalu muncul di bawah */
+        .sb-footer { 
+            flex-shrink: 0; 
+            padding: 1rem; 
+            background: #0a0a0a; 
+            border-top: 1px solid #222;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding-bottom: 1.5rem; 
         }
 
-        .sidebar-item { transition: 0.2s; cursor: pointer; border-left: 4px solid transparent; margin-bottom: 0.5rem; border-radius: 0.75rem; padding: 1rem; }
+        /* EDITOR AREA */
+        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; background: #050505; min-width: 0; }
+        .editor-header { flex-shrink: 0; height: 64px; border-bottom: 1px solid #1a1a1a; display: flex; items-center; justify-content: space-between; padding: 0 2rem; background: black; }
+        .editor-body { flex: 1; overflow-y: auto; padding: 2rem; -webkit-overflow-scrolling: touch; }
+
+        .novel-editor { 
+            font-family: 'Crimson Pro', serif; font-size: 1.3rem; line-height: 1.8; background: #0a0a0a; border: 1px solid #1a1a1a; 
+            color: #e5e5e5; padding: 2rem; border-radius: 1.5rem; width: 100%; outline: none; min-height: 900px; resize: none;
+        }
+
+        .sidebar-item { transition: 0.2s; cursor: pointer; border-left: 4px solid transparent; margin-bottom: 0.5rem; border-radius: 0.75rem; padding: 0.8rem; }
         .sidebar-item.active { background: #111; border-left-color: #3b82f6; color: white; }
 
-        /* Scrollbar styling */
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
 
-        .input-dark { background: #111; border: 1px solid #222; color: white; border-radius: 0.75rem; padding: 0.75rem; outline: none; width: 100%; font-size: 0.75rem; }
+        .input-dark { background: #111; border: 1px solid #222; color: white; border-radius: 0.5rem; padding: 0.6rem; outline: none; width: 100%; font-size: 0.75rem; }
         .btn-blue { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; font-weight: 900; }
         
         .loader { width: 40px; height: 40px; border: 4px solid #111; border-bottom-color: #3b82f6; border-radius: 50%; animation: rotation 1s linear infinite; }
@@ -86,66 +73,60 @@
 </head>
 <body>
 
-    <div class="app-grid">
+    <div class="app-wrapper">
         <aside class="sidebar">
-            <div class="header-sidebar">
+            <div class="sb-header text-center">
                 <h1 class="text-xl font-black text-blue-500 italic uppercase">v15 EVOLUTION</h1>
             </div>
             
-            <div class="config-sidebar">
+            <div class="sb-config">
                 <input type="text" id="mainNovelTitle" placeholder="Judul Novel..." class="input-dark font-bold" oninput="saveAll()">
                 <input type="password" id="apiKey" placeholder="Gemini API Key..." class="input-dark">
-                <button onclick="checkAPI()" id="apiStatus" class="w-full py-2 bg-gray-900 text-[10px] font-black rounded-lg border border-gray-800 uppercase">Cek Engine</button>
+                <button onclick="checkAPI()" id="apiStatus" class="w-full py-1.5 bg-gray-900 text-[10px] font-black rounded-lg border border-gray-800 uppercase">Cek Engine</button>
             </div>
 
-            <div id="chapterList" class="nav-scroll-area">
+            <div id="chapterList" class="sb-nav-scroll">
                 </div>
 
-            <div class="footer-sidebar">
-                <button onclick="exportAll('txt')" class="w-full py-2.5 bg-gray-800 text-[10px] font-black rounded-xl uppercase tracking-widest">EKSPOR TXT</button>
-                <button onclick="exportAll('html')" class="w-full py-2.5 border-2 border-blue-900 text-blue-500 text-[10px] font-black rounded-xl uppercase tracking-widest">EKSPOR HTML</button>
-                <button onclick="resetApp()" class="mt-1 text-[8px] text-red-900 font-bold uppercase opacity-50">Reset Draf</button>
+            <div class="sb-footer">
+                <button onclick="exportAll('txt')" class="w-full py-2 bg-gray-800 text-[10px] font-black rounded-lg uppercase tracking-widest">EKSPOR TXT</button>
+                <button onclick="exportAll('html')" class="w-full py-2 border border-blue-800 text-blue-500 text-[10px] font-black rounded-lg uppercase tracking-widest">EKSPOR HTML</button>
+                <button onclick="resetApp()" class="text-[8px] text-red-900 font-bold uppercase text-center opacity-40">Reset Draf</button>
             </div>
         </aside>
 
-        <main class="editor-grid">
-            <header class="border-b border-gray-900 flex items-center justify-between px-8 bg-black/50 backdrop-blur-md">
+        <main class="main-content">
+            <header class="editor-header flex items-center">
                 <div class="flex items-center gap-4">
                     <span id="currentChapterLabel" class="text-[9px] font-black text-blue-500 uppercase tracking-widest">Prolog</span>
-                    <input type="text" id="currentChapterTitle" placeholder="Judul Bab..." class="bg-transparent border-none text-white font-black text-lg outline-none w-48 md:w-80" oninput="updateChapterData()">
+                    <input type="text" id="currentChapterTitle" placeholder="Judul Bab..." class="bg-transparent border-none text-white font-black text-lg outline-none w-48" oninput="updateChapterData()">
                 </div>
                 <div class="flex gap-2">
                     <button onclick="writeChapter()" class="px-6 py-2 btn-blue rounded-full text-[10px] uppercase tracking-widest">TULIS</button>
-                    <button onclick="addNewChapter()" class="px-4 py-2 bg-white text-black font-black rounded-full text-[9px] uppercase hover:bg-blue-500 transition">BAB +</button>
+                    <button onclick="addNewChapter()" class="px-4 py-2 bg-white text-black font-black rounded-full text-[9px] uppercase">BAB +</button>
                 </div>
             </header>
 
-            <div class="editor-scroll">
-                <div class="max-w-4xl mx-auto space-y-8">
+            <div class="editor-body">
+                <div class="max-w-4xl mx-auto space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <label class="text-[9px] font-black text-gray-500 uppercase">Konsep Dunia</label>
-                            <textarea id="globalIdea" rows="2" class="input-dark" oninput="saveAll()"></textarea>
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-[9px] font-black text-blue-500 uppercase italic">Tujuan Bab Ini</label>
-                            <textarea id="chapterInstruction" rows="2" class="input-dark" oninput="updateChapterData()"></textarea>
-                        </div>
+                        <textarea id="globalIdea" rows="2" class="input-dark" placeholder="Konsep Dunia..." oninput="saveAll()"></textarea>
+                        <textarea id="chapterInstruction" rows="2" class="input-dark border-blue-900/30" placeholder="Tujuan Bab..." oninput="updateChapterData()"></textarea>
                     </div>
 
-                    <textarea id="mainContent" class="novel-editor" oninput="updateChapterData()" placeholder="Narasi bab..."></textarea>
+                    <textarea id="mainContent" class="novel-editor" oninput="updateChapterData()" placeholder="Narasi..."></textarea>
                     
                     <div class="bg-[#0a0a0a] border border-gray-900 p-6 rounded-3xl mb-10">
-                        <label class="text-[9px] font-black text-blue-500 uppercase italic mb-2 block">Memory Bridge</label>
+                        <label class="text-[9px] font-black text-blue-500 uppercase italic block mb-2">Memory Bridge</label>
                         <div id="memoryBridge" class="text-xs text-gray-500 italic leading-relaxed">Belum ada memori.</div>
                     </div>
-                    <div style="height: 150px;"></div>
+                    <div style="height: 100px;"></div>
                 </div>
             </div>
         </main>
 
-        <div id="loader" class="hidden fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center text-center">
-            <div class="loader mb-6"></div>
+        <div id="loader" class="hidden fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center">
+            <div class="loader mb-4"></div>
             <p class="text-[10px] font-black tracking-widest text-blue-500 uppercase">Engine Menulis...</p>
         </div>
     </div>
@@ -167,7 +148,7 @@
                 prevContext = `SAMBUNGAN BAB SEBELUMNYA: "...${prev.content.slice(-1500)}"\nMemori Terakhir: ${prev.bridge}\n`;
             }
 
-            const prompt = `PENULIS NOVEL PROFESIONAL. JUDUL: ${getEl('mainNovelTitle').value}\nDUNIA: ${getEl('globalIdea').value}\n${prevContext}INSTRUKSI BAB: ${getEl('chapterInstruction').value}\nATURAN: Tulis narasi langsung (min 1500 kata). GAYA: Sastra Deskriptif Tanpa Basa-basi.`;
+            const prompt = `PENULIS NOVEL PROFESIONAL. JUDUL: ${getEl('mainNovelTitle').value}\nDUNIA: ${getEl('globalIdea').value}\n${prevContext}INSTRUKSI BAB: ${getEl('chapterInstruction').value}\nATURAN: Tulis narasi langsung naskah (min 1500 kata). GAYA: Sastra Deskriptif.`;
 
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
@@ -181,7 +162,7 @@
 
                 const bRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: `Analisis poin tokoh & lokasi bab ini: ${text.substring(0, 2500)}` }] }] })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: `Catat poin penting tokoh/lokasi: ${text.substring(0, 2500)}` }] }] })
                 });
                 const bd = await bRes.json();
                 chapters[activeIdx].bridge = bd.candidates[0].content.parts[0].text.trim();
@@ -189,7 +170,7 @@
 
                 saveAll();
                 renderChapterList();
-            } catch (e) { alert("Error API/Limit."); }
+            } catch (e) { alert("Error API."); }
             finally { getEl('loader').classList.add('hidden'); }
         }
 
@@ -232,11 +213,11 @@
 
         function saveAll() {
             const data = { mainTitle: getEl('mainNovelTitle').value, idea: getEl('globalIdea').value, chapters: chapters, key: getEl('apiKey').value };
-            localStorage.setItem('tebe_v15_mobile_pro', JSON.stringify(data));
+            localStorage.setItem('tebe_v15_tab_fix', JSON.stringify(data));
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem('tebe_v15_mobile_pro');
+            const saved = localStorage.getItem('tebe_v15_tab_fix');
             if(saved) {
                 const d = JSON.parse(saved);
                 getEl('mainNovelTitle').value = d.mainTitle || "";
@@ -264,8 +245,8 @@
                 });
                 out += `</div></body></html>`;
             } else {
-                out = `JUDUL NOVEL: ${mainTitle.toUpperCase()}\n\n`;
-                chapters.forEach(ch => { out += `\n\n--- ${ch.label.toUpperCase()}: ${ch.title.toUpperCase()} ---\n\n${ch.content}`; });
+                out = `JUDUL: ${mainTitle}\n\n`;
+                chapters.forEach(ch => { out += `\n\n--- ${ch.label}: ${ch.title} ---\n\n${ch.content}`; });
             }
             const blob = new Blob([out], { type: format === 'html' ? 'text/html' : 'text/plain' });
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${mainTitle}.${format}`; a.click();
