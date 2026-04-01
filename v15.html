@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>v15 EVOLUTION - Serial Writer</title>
+    <title>v15 EVOLUTION - Serial Writer Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;700&family=Inter:wght@400;900&display=swap');
@@ -19,14 +19,21 @@
 </head>
 <body class="flex h-screen overflow-hidden">
 
-    <div class="w-64 bg-[#080808] border-r border-gray-900 flex flex-col">
+    <div class="w-72 bg-[#080808] border-r border-gray-900 flex flex-col">
         <div class="p-6 border-b border-gray-900">
             <h1 class="text-xl font-black tracking-tighter text-blue-500 uppercase italic">v15 EVOLUTION</h1>
         </div>
         
-        <div class="p-4 space-y-4">
-            <input type="password" id="apiKey" placeholder="Gemini API Key..." class="text-[10px] input-dark">
-            <button onclick="checkAPI()" id="apiStatus" class="w-full py-2 bg-gray-900 text-[9px] font-black rounded-lg uppercase border border-gray-800">Cek Engine</button>
+        <div class="p-4 space-y-4 border-b border-gray-900">
+            <div class="space-y-1">
+                <label class="text-[9px] font-black text-gray-600 uppercase">Judul Utama Novel</label>
+                <input type="text" id="mainNovelTitle" placeholder="Nama Mahakarya..." class="input-dark text-xs font-bold" oninput="saveAll()">
+            </div>
+            <div class="space-y-1">
+                <label class="text-[9px] font-black text-gray-600 uppercase">Engine Access</label>
+                <input type="password" id="apiKey" placeholder="Gemini API Key..." class="text-[10px] input-dark">
+                <button onclick="checkAPI()" id="apiStatus" class="w-full py-2 bg-gray-900 text-[9px] font-black rounded-lg uppercase border border-gray-800">Cek Engine</button>
+            </div>
         </div>
 
         <div id="chapterList" class="flex-1 overflow-y-auto custom-scroll p-2 space-y-1">
@@ -43,7 +50,7 @@
         <header class="h-16 border-b border-gray-900 flex items-center justify-between px-10 bg-black/50 backdrop-blur-md">
             <div class="flex items-center gap-4">
                 <span id="currentChapterLabel" class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Prolog</span>
-                <input type="text" id="currentChapterTitle" placeholder="Judul Bab..." class="bg-transparent border-none text-white font-bold text-lg outline-none w-64" oninput="updateChapterData()">
+                <input type="text" id="currentChapterTitle" placeholder="Judul Bab Ini..." class="bg-transparent border-none text-white font-bold text-lg outline-none w-64" oninput="updateChapterData()">
             </div>
             <div class="flex gap-4">
                 <button onclick="writeChapter()" id="writeBtn" class="px-8 py-2 btn-blue rounded-full text-xs shadow-lg shadow-blue-900/20 uppercase tracking-widest">TULIS NARASI</button>
@@ -55,63 +62,73 @@
             <div class="max-w-4xl mx-auto space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-2">
-                        <label class="text-[9px] font-black text-gray-600 uppercase">Ide Utama / Dunia</label>
-                        <textarea id="globalIdea" rows="2" class="text-xs input-dark" placeholder="Garis besar cerita..."></textarea>
+                        <label class="text-[9px] font-black text-gray-600 uppercase">Konsep Dunia & Sistem</label>
+                        <textarea id="globalIdea" rows="2" class="text-xs input-dark" placeholder="Garis besar cerita, aturan sistem, dll..." oninput="saveAll()"></textarea>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-[9px] font-black text-gray-600 uppercase">Tujuan Bab Ini (Instruksi)</label>
-                        <textarea id="chapterInstruction" rows="2" class="text-xs input-dark" placeholder="Apa yang terjadi di bab ini?"></textarea>
+                        <label class="text-[9px] font-black text-gray-600 uppercase">Tujuan / Instruksi Bab Ini</label>
+                        <textarea id="chapterInstruction" rows="2" class="text-xs input-dark" placeholder="Apa yang terjadi di bab ini?" oninput="updateChapterData()"></textarea>
                     </div>
                 </div>
 
-                <textarea id="mainContent" class="novel-editor" placeholder="Narasi bab akan muncul di sini secara utuh..." oninput="updateChapterData()"></textarea>
+                <textarea id="mainContent" class="novel-editor" placeholder="Narasi bab..." oninput="updateChapterData()"></textarea>
                 
                 <div class="bg-[#0a0a0a] border border-gray-900 p-4 rounded-xl">
-                    <label class="text-[9px] font-black text-blue-500 uppercase italic">Memory Bridge (Otomatis)</label>
-                    <div id="memoryBridge" class="text-[11px] text-gray-500 italic mt-1">Belum ada memori terdeteksi.</div>
+                    <label class="text-[9px] font-black text-blue-500 uppercase italic">Memory Bridge (Logika Cerita)</label>
+                    <div id="memoryBridge" class="text-[11px] text-gray-500 italic mt-1">Belum ada memori.</div>
                 </div>
             </div>
         </main>
 
-        <div id="loader" class="hidden absolute inset-0 z-50 bg-black/80 flex flex-col items-center justify-center">
+        <div id="loader" class="hidden absolute inset-0 z-50 bg-black/90 flex flex-col items-center justify-center">
             <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p id="loaderMsg" class="text-[10px] font-black tracking-widest text-blue-500 uppercase">Engine Berpikir...</p>
+            <p id="loaderMsg" class="text-[10px] font-black tracking-widest text-blue-500 uppercase">Engine Sedang Menulis...</p>
         </div>
     </div>
 
     <script>
-        let chapters = [{ label: "Prolog", title: "", content: "", bridge: "", instruction: "" }];
+        // PROLOG DEFAULT INSTRUCTION
+        const PROLOG_DEFAULT = "Perkenalkan karakter utama secara mendalam, jelaskan latar belakang dunianya, aturan sistem yang ia miliki, dan bagaimana konflik pertama kali muncul. Fokus pada detail sensorik dan suasana.";
+        
+        let chapters = [{ 
+            label: "Prolog", 
+            title: "", 
+            content: "", 
+            bridge: "", 
+            instruction: PROLOG_DEFAULT 
+        }];
         let activeIdx = 0;
 
         const getEl = id => document.getElementById(id);
 
-        // --- CORE LOGIC ---
         async function writeChapter() {
             const key = getEl('apiKey').value;
-            if(!key) return alert("API Key Kosong!");
+            if(!key) return alert("Isi API Key!");
 
             getEl('loader').classList.remove('hidden');
-            getEl('loaderMsg').innerText = "Menulis Narasi Detail...";
+            getEl('loaderMsg').innerText = "Menyusun Narasi Panjang...";
 
-            // Ambil konteks bab sebelumnya
             let prevContext = "";
             if (activeIdx > 0) {
                 const prev = chapters[activeIdx - 1];
-                prevContext = `SITUASI TERAKHIR BAB SEBELUMNYA:
-                - Narasi Terakhir: "...${prev.content.slice(-1200)}"
-                - Memori Logika: ${prev.bridge}
-                SAMBUNGKAN SECARA LINEAR.\n`;
+                prevContext = `SAMBUNGAN LANGSUNG DARI BAB SEBELUMNYA:
+                - Akhir Teks: "...${prev.content.slice(-1200)}"
+                - Status Logika: ${prev.bridge}\n`;
             }
 
-            const prompt = `Anda adalah penulis novel sastra profesional.
-            DUNIA: ${getEl('globalIdea').value}
-            GAYA: Deskriptif, mendalam, tanpa basa-basi (Clean).
-            TARGET: Narasi sangat panjang (min 1500 kata).
+            const prompt = `PENULIS NOVEL PROFESIONAL.
+            JUDUL NOVEL: ${getEl('mainNovelTitle').value}
+            DUNIA & SISTEM: ${getEl('globalIdea').value}
+            GAYA: Sastra, Deskriptif, Clean (Tanpa basa-basi).
             
             ${prevContext}
             INSTRUKSI BAB INI: ${getEl('chapterInstruction').value}
             
-            ATURAN: Langsung tulis narasi naskah. Jangan mengulang perkenalan karakter yang sudah ada. Jangan meringkas alur. Fokus pada dialog dan detail sensorik.`;
+            ATURAN KETAT:
+            1. Tulis narasi LANGSUNG. Jangan menyapa user.
+            2. Minimal 1500 kata. Ekspansi adegan sedetail mungkin.
+            3. Jika ini Prolog, fokus pada pondasi karakter dan dunia.
+            4. Jika ini Bab Lanjutan, pastikan alur menyambung sempurna tanpa pengulangan intro.`;
 
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
@@ -125,12 +142,12 @@
                 getEl('mainContent').value = text;
                 chapters[activeIdx].content = text;
 
-                // Create Bridge
-                getEl('loaderMsg').innerText = "Mencatat Memori...";
+                // Auto Bridge
+                getEl('loaderMsg').innerText = "Meringkas Logika Bab...";
                 const bRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: `Ringkas poin penting (status tokoh, lokasi, item) dari bab ini untuk panduan bab depan: ${text.substring(0, 3000)}` }] }] })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: `Analisis teks bab ini dan catat poin penting (lokasi, barang, status tokoh) untuk bab selanjutnya: ${text.substring(0, 3000)}` }] }] })
                 });
                 const bd = await bRes.json();
                 const bridge = bd.candidates[0].content.parts[0].text.trim();
@@ -140,11 +157,10 @@
 
                 saveAll();
                 renderChapterList();
-            } catch (e) { alert("Error!"); console.error(e); }
+            } catch (e) { alert("Error!"); }
             finally { getEl('loader').classList.add('hidden'); }
         }
 
-        // --- NAVIGATION ---
         function addNewChapter() {
             const num = chapters.length;
             chapters.push({ label: `Bab ${num}`, title: "", content: "", bridge: "", instruction: "" });
@@ -182,16 +198,21 @@
             });
         }
 
-        // --- STORAGE & EXPORT ---
         function saveAll() {
-            const data = { idea: getEl('globalIdea').value, chapters: chapters, key: getEl('apiKey').value };
-            localStorage.setItem('tebe_v15_evolution', JSON.stringify(data));
+            const data = { 
+                mainTitle: getEl('mainNovelTitle').value,
+                idea: getEl('globalIdea').value, 
+                chapters: chapters, 
+                key: getEl('apiKey').value 
+            };
+            localStorage.setItem('tebe_v15_evolution_pro', JSON.stringify(data));
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem('tebe_v15_evolution');
+            const saved = localStorage.getItem('tebe_v15_evolution_pro');
             if(saved) {
                 const d = JSON.parse(saved);
+                getEl('mainNovelTitle').value = d.mainTitle || "";
                 getEl('globalIdea').value = d.idea || "";
                 getEl('apiKey').value = d.key || "";
                 chapters = d.chapters;
@@ -200,31 +221,33 @@
         }
 
         function exportAll(format) {
-            const title = getEl('globalIdea').value.substring(0, 20) || "Novel";
+            const mainTitle = getEl('mainNovelTitle').value || "Novel";
             let out = "";
             if(format === 'html') {
                 out = `<html><body style="font-family:serif; padding:50px; background:#f4ece0; line-height:1.8;">`;
+                out += `<h1 style="text-align:center; font-size:3rem;">${mainTitle}</h1><hr>`;
                 chapters.forEach(ch => {
-                    out += `<h2 style="text-align:center; color:#8b6b23;">${ch.label}: ${ch.title}</h2><p style="white-space:pre-wrap;">${ch.content}</p><hr>`;
+                    out += `<h2 style="text-align:center;">${ch.label}: ${ch.title}</h2><p style="white-space:pre-wrap;">${ch.content}</p><hr>`;
                 });
                 out += `</body></html>`;
             } else {
+                out = `JUDUL UTAMA: ${mainTitle}\n\n`;
                 chapters.forEach(ch => {
                     out += `\n\n--- ${ch.label}: ${ch.title} ---\n\n${ch.content}`;
                 });
             }
             const blob = new Blob([out], { type: format === 'html' ? 'text/html' : 'text/plain' });
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${title}.${format}`; a.click();
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${mainTitle}.${format}`; a.click();
         }
 
-        function resetApp() { if(confirm("Hapus draf?")) { localStorage.clear(); location.reload(); } }
+        function resetApp() { if(confirm("Hapus seluruh draf?")) { localStorage.clear(); location.reload(); } }
         async function checkAPI() { 
             const key = getEl('apiKey').value;
             if(!key) return alert("Key Kosong");
             getEl('apiStatus').innerText = "Koneksi...";
             try { 
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
-                if(res.ok) { getEl('apiStatus').innerText = "ENGINE ONLINE"; getEl('apiStatus').style.color = "#3b82f6"; }
+                if(res.ok) { getEl('apiStatus').innerText = "ONLINE"; getEl('apiStatus').style.color = "#3b82f6"; }
             } catch(e) { alert("Gagal"); }
         }
     </script>
