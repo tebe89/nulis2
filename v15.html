@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>v15 STREAM - Reader Edition</title>
+    <title>v15 STREAM - Pro Reader</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;700;900&display=swap');
@@ -15,23 +15,23 @@
             grid-template-columns: 280px 1fr; 
             grid-template-rows: 70px 1fr;
             height: 100vh; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
         }
 
         .sidebar-hidden { grid-template-columns: 0px 1fr; }
 
         /* SIDEBAR */
-        .sidebar { background: #080808; border-right: 1px solid #1a1a1a; display: flex; flex-direction: column; overflow: hidden; transition: 0.3s; }
+        .sidebar { background: #080808; border-right: 1px solid #1a1a1a; display: flex; flex-direction: column; overflow: hidden; }
         .chapter-nav { flex: 1; overflow-y: auto; padding: 15px; -webkit-overflow-scrolling: touch; }
 
-        /* READER MODE vs EDIT MODE */
+        /* READER MODE - OPTIMIZED WIDTH & DARK CREAM */
         .reader-view { 
-            font-family: 'Crimson Pro', serif; font-size: 1.4rem; line-height: 1.9; 
-            background: #f4ece0; color: #1a1a1a; padding: 60px 40px; 
-            border-radius: 5px; box-shadow: 0 0 40px rgba(0,0,0,0.5);
-            max-width: 850px; margin: 0 auto; min-height: 100%; text-align: justify;
+            font-family: 'Crimson Pro', serif; font-size: 1.45rem; line-height: 1.85; 
+            background: #d9cfb8; color: #2c241a; padding: 50px 30px; 
+            border-radius: 4px; box-shadow: 0 0 50px rgba(0,0,0,0.3);
+            max-width: 95%; margin: 0 auto; min-height: 100%; text-align: justify;
         }
-        .reader-view p { margin-bottom: 1.5rem; text-indent: 2.5rem; }
+        .reader-view p { margin-bottom: 1.4rem; text-indent: 2.5rem; }
 
         .edit-view { 
             font-family: 'Crimson Pro', serif; font-size: 1.25rem; line-height: 1.8; 
@@ -44,17 +44,15 @@
         .sidebar-item { padding: 12px; margin-bottom: 6px; border-radius: 10px; cursor: pointer; border-left: 4px solid transparent; font-size: 11px; background: #0c0c0c; }
         .sidebar-item.active { background: #111; border-left-color: #3b82f6; color: white; font-weight: bold; }
         
-        /* NOTIFIKASI */
         #toast { 
             position: fixed; bottom: 30px; right: 30px; transform: translateY(100px);
             background: #10b981; color: white; padding: 12px 25px; border-radius: 50px;
-            font-weight: 800; font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
-            transition: 0.5s; z-index: 1000; box-shadow: 0 10px 20px rgba(16,185,129,0.3);
+            font-weight: 800; font-size: 10px; text-transform: uppercase; transition: 0.5s; z-index: 1000;
         }
         #toast.show { transform: translateY(0); }
 
         .input-dark { background: #111; border: 1px solid #222; color: white; border-radius: 10px; padding: 8px 12px; outline: none; font-size: 11px; }
-        .btn-toggle { background: #111; border: 1px solid #333; color: #999; padding: 5px 10px; border-radius: 8px; font-size: 10px; font-weight: 900; }
+        .select-model { background: #111; border: 1px solid #3b82f6; color: #3b82f6; border-radius: 10px; padding: 8px; font-size: 10px; font-weight: 800; outline: none; }
         
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
@@ -64,16 +62,14 @@
 
     <div id="master" class="master-layout">
         <header class="col-span-2 bg-[#0a0a0a] border-b border-gray-900 flex items-center px-5 gap-4 z-[100]">
-            <button onclick="toggleSidebar()" class="btn-toggle">☰</button>
-            <h1 class="text-blue-500 font-black italic text-lg tracking-tighter uppercase flex-shrink-0">v15 STREAM</h1>
+            <button onclick="toggleSidebar()" class="px-3 py-2 bg-[#111] border border-gray-800 text-gray-400 rounded-lg font-black">☰</button>
+            <h1 class="text-blue-500 font-black italic text-lg uppercase flex-shrink-0">v15 STREAM</h1>
             
-            <div class="flex-1 flex gap-2 overflow-x-auto py-2">
-                <input type="text" id="mainNovelTitle" placeholder="Judul Novel..." class="input-dark w-32 font-bold flex-shrink-0">
-                <input type="password" id="apiKey" placeholder="API Key..." class="input-dark w-32 flex-shrink-0">
-                <select id="modelSelect" class="input-dark text-blue-400 font-bold w-32 flex-shrink-0">
-                    <option value="gemini-1.5-pro">Gemini 1.5 PRO</option>
-                    <option value="gemini-1.5-flash">Gemini 1.5 FLASH</option>
-                </select>
+            <div class="flex-1 flex gap-2 items-center">
+                <input type="text" id="mainNovelTitle" placeholder="Judul Novel..." class="input-dark w-32 font-bold" oninput="saveAll()">
+                <input type="password" id="apiKey" placeholder="API Key..." class="input-dark w-32">
+                <button onclick="fetchModels()" id="btnFetch" class="text-[9px] font-black text-gray-500 uppercase">Hubungkan</button>
+                <select id="modelSelect" class="select-model hidden"></select>
             </div>
 
             <div class="flex gap-2">
@@ -84,15 +80,12 @@
         </header>
 
         <aside class="sidebar">
-            <div class="p-4 border-b border-gray-900 flex justify-between items-center text-[10px] font-black uppercase text-gray-600">Alur Takdir</div>
+            <div class="p-4 border-b border-gray-900 text-[10px] font-black text-gray-600 uppercase tracking-widest">Daftar Bab</div>
             <div id="chapterNav" class="chapter-nav"></div>
-            <div class="p-4 border-t border-gray-900 bg-black/40">
-                <button onclick="resetApp()" class="w-full py-2 text-[8px] text-red-900 font-black uppercase opacity-40">Reset Draf</button>
-            </div>
         </aside>
 
         <main id="mainView" class="overflow-y-auto bg-[#050505] p-5 -webkit-overflow-scrolling: touch;">
-            <div id="contentContainer" class="max-w-4xl mx-auto space-y-6 pb-40">
+            <div id="contentContainer" class="max-w-5xl mx-auto space-y-6 pb-40">
                 
                 <div id="editControls" class="space-y-6">
                     <div class="flex items-center justify-between bg-[#0a0a0a] p-5 rounded-3xl border border-gray-900">
@@ -100,23 +93,23 @@
                             <span id="currentLabel" class="text-[10px] font-black text-blue-600 uppercase tracking-widest">Prolog</span>
                             <input type="text" id="currentTitle" placeholder="Judul Bab..." class="bg-transparent border-none text-white font-bold text-2xl outline-none w-full">
                         </div>
-                        <button onclick="runWritingProcess()" id="writeBtn" class="px-8 py-3 bg-blue-600 text-white font-black rounded-full text-[10px] uppercase tracking-widest shadow-lg shadow-blue-900/30">BUAT NARASI</button>
+                        <button onclick="runWritingProcess()" id="writeBtn" class="px-8 py-3 bg-blue-600 text-white font-black rounded-full text-[10px] uppercase shadow-lg shadow-blue-900/30">BUAT NARASI</button>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <textarea id="globalIdea" rows="3" class="input-dark w-full" placeholder="Konsep Dunia..."></textarea>
-                        <textarea id="chapterInstruction" rows="3" class="input-dark w-full border-blue-900/20" placeholder="Alur Bab Ini..."></textarea>
+                        <textarea id="globalIdea" rows="3" class="input-dark w-full" placeholder="Konsep Dunia..." oninput="saveAll()"></textarea>
+                        <textarea id="chapterInstruction" rows="3" class="input-dark w-full border-blue-900/20" placeholder="Alur Bab Ini..." oninput="updateChapterData()"></textarea>
                     </div>
                 </div>
 
                 <div id="displayArea">
-                    <textarea id="mainContent" class="edit-view hidden" placeholder="Naskah..."></textarea>
+                    <textarea id="mainContent" class="edit-view hidden" oninput="updateChapterData()" placeholder="Narasi..."></textarea>
                     <div id="readerArea" class="reader-view hidden"></div>
                 </div>
 
                 <div id="bgStatus" class="hidden bg-blue-900/20 border border-blue-800 p-4 rounded-xl flex items-center gap-4">
                     <div class="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                    <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest">AI Sedang Menulis di Latar Belakang... Anda Bisa Tetap Membaca.</span>
+                    <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest italic">AI Sedang Menulis di Latar Belakang...</span>
                 </div>
 
                 <div class="flex justify-between items-center pt-10">
@@ -136,8 +129,23 @@
         let currentMode = 'edit';
         const getEl = id => document.getElementById(id);
 
-        // UI ACTIONS
         function toggleSidebar() { getEl('master').classList.toggle('sidebar-hidden'); }
+
+        async function fetchModels() {
+            const key = getEl('apiKey').value;
+            if(!key) return alert("Input API Key!");
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+                const data = await res.json();
+                if(data.models) {
+                    const sel = getEl('modelSelect');
+                    const filtered = data.models.filter(m => m.supportedGenerationMethods.includes('generateContent'));
+                    sel.innerHTML = filtered.map(m => `<option value="${m.name}">${m.displayName.replace("Gemini ","")}</option>`).join('');
+                    sel.classList.remove('hidden');
+                    getEl('btnFetch').classList.add('hidden');
+                }
+            } catch (e) { alert("Gagal koneksi API."); }
+        }
 
         function setView(mode) {
             currentMode = mode;
@@ -145,7 +153,7 @@
                 getEl('editControls').classList.add('hidden');
                 getEl('mainContent').classList.add('hidden');
                 getEl('readerArea').classList.remove('hidden');
-                getEl('mainView').style.backgroundColor = "#e4dccb";
+                getEl('mainView').style.backgroundColor = "#c4ba9f";
                 renderReader();
             } else {
                 getEl('editControls').classList.remove('hidden');
@@ -153,34 +161,30 @@
                 getEl('readerArea').classList.add('hidden');
                 getEl('mainView').style.backgroundColor = "#050505";
             }
-            getEl('btnRead').className = mode === 'read' ? 'px-4 py-2 bg-white text-black text-[9px] font-black rounded-lg uppercase' : 'px-4 py-2 bg-gray-900 text-white text-[9px] font-black rounded-lg uppercase';
-            getEl('btnEdit').className = mode === 'edit' ? 'px-4 py-2 bg-blue-600 text-white text-[9px] font-black rounded-lg uppercase' : 'px-4 py-2 border border-blue-900 text-blue-500 text-[9px] font-black rounded-lg uppercase';
         }
 
         function renderReader() {
             const ch = chapters[activeIdx];
-            const content = ch.content ? ch.content.split('\n').filter(p=>p.trim()!="").map(p=>`<p>${p.trim()}</p>`).join('') : "<p style='text-align:center; opacity:0.3;'>Belum ada narasi di bab ini.</p>";
-            getEl('readerArea').innerHTML = `<h1 style="text-align:center; font-size:2.5rem; color:#4a3c28; margin-bottom:40px;">${ch.title}</h1>${content}`;
+            const content = ch.content ? ch.content.split('\n').filter(p=>p.trim()!="").map(p=>`<p>${p.trim()}</p>`).join('') : "<p style='text-align:center; opacity:0.3;'>Belum ada narasi.</p>";
+            getEl('readerArea').innerHTML = `<h1 style="text-align:center; font-size:2.8rem; color:#3a3020; margin-bottom:40px;">${ch.title}</h1>${content}`;
             getEl('mainView').scrollTop = 0;
         }
 
-        // BACKGROUND WRITING
         async function runWritingProcess() {
-            if(isWriting) return alert("AI sedang sibuk menulis di latar belakang.");
+            if(isWriting) return;
             const key = getEl('apiKey').value;
             const model = getEl('modelSelect').value;
             const idea = getEl('globalIdea').value;
             const instr = getEl('chapterInstruction').value;
 
-            if(!key || !idea || !instr) return alert("Lengkapi API Key, Konsep, dan Instruksi!");
+            if(!key || !model || !idea) return alert("API Key dan Konsep harus diisi!");
 
             isWriting = true;
             getEl('bgStatus').classList.remove('hidden');
             getEl('writeBtn').disabled = true;
-            getEl('writeBtn').innerText = "MENULIS...";
 
-            let prevText = activeIdx > 0 ? `SAMBUNGAN: "...${chapters[activeIdx-1].content.slice(-1500)}"\n` : "";
-            const prompt = `PENULIS NOVEL. DUNIA: ${idea}\n${prevText}BAB INI: ${instr}\nATURAN: Tulis narasi langsung (min 1500 kata). Deep & Deskriptif.`;
+            let prev = activeIdx > 0 ? `SAMBUNGAN: "...${chapters[activeIdx-1].content.slice(-1500)}"\n` : "";
+            const prompt = `PENULIS NOVEL. DUNIA: ${idea}\n${prev}BAB INI: ${instr}\nATURAN: Tulis narasi langsung naskah (min 1500 kata). Deep & Deskriptif.`;
 
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`, {
@@ -189,34 +193,25 @@
                 });
                 const d = await res.json();
                 const text = d.candidates[0].content.parts[0].text.trim();
-                
                 chapters[activeIdx].content = text;
                 if(currentMode === 'edit') getEl('mainContent').value = text;
-                if(currentMode === 'read' && activeIdx === chapters.length - 1) renderReader();
-                
+                if(currentMode === 'read') renderReader();
                 showToast();
                 saveAll();
-            } catch (e) { alert("Error API!"); }
+            } catch (e) { alert("Error!"); }
             finally {
                 isWriting = false;
                 getEl('bgStatus').classList.add('hidden');
                 getEl('writeBtn').disabled = false;
-                getEl('writeBtn').innerText = "BUAT NARASI";
             }
         }
 
-        function showToast() {
-            getEl('toast').classList.add('show');
-            setTimeout(() => getEl('toast').classList.remove('show'), 3000);
-        }
+        function showToast() { getEl('toast').classList.add('show'); setTimeout(() => getEl('toast').classList.remove('show'), 3000); }
 
-        // DATA LOGIC
         async function prepareNextChapter() {
             const key = getEl('apiKey').value;
-            if(!key || !chapters[activeIdx].content) return alert("Butuh API Key dan narasi bab ini selesai.");
-            
-            getEl('loader').classList.remove('hidden');
-            const prompt = `Analisis bab ini: "${chapters[activeIdx].content.slice(-1500)}". Berikan rencana alur pendek bab selanjutnya. Tulis alurnya saja.`;
+            if(!key || !chapters[activeIdx].content) return alert("Selesaikan bab ini dulu!");
+            const prompt = `Analisis bab ini: "${chapters[activeIdx].content.slice(-1500)}". Berikan rencana alur pendek bab selanjutnya.`;
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -224,11 +219,9 @@
                 });
                 const d = await res.json();
                 const nextAlur = d.candidates[0].content.parts[0].text.trim();
-                const newIdx = chapters.length;
-                chapters.push({ label: `Bab ${newIdx}`, title: `Bab ${newIdx}`, content: "", instruction: nextAlur });
-                switchChapter(newIdx);
-            } catch(e) { alert("Gagal merancang alur."); }
-            finally { getEl('loader').classList.add('hidden'); }
+                chapters.push({ label: `Bab ${chapters.length}`, title: `Bab ${chapters.length}`, content: "", instruction: nextAlur });
+                switchChapter(chapters.length - 1);
+            } catch(e) { alert("Gagal."); }
         }
 
         function switchChapter(idx) {
@@ -244,8 +237,7 @@
         }
 
         function renderNav() {
-            const nav = getEl('chapterNav');
-            nav.innerHTML = "";
+            const nav = getEl('chapterNav'); nav.innerHTML = "";
             chapters.forEach((ch, i) => {
                 const div = document.createElement('div');
                 div.className = `sidebar-item ${i === activeIdx ? 'active' : ''}`;
@@ -257,37 +249,32 @@
 
         function saveAll() {
             const data = { title: getEl('mainNovelTitle').value, idea: getEl('globalIdea').value, chapters, key: getEl('apiKey').value, model: getEl('modelSelect').value };
-            localStorage.setItem('v15_reader_edition', JSON.stringify(data));
+            localStorage.setItem('v15_reader_final', JSON.stringify(data));
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem('v15_reader_edition');
+            const saved = localStorage.getItem('v15_reader_final');
             if(saved) {
                 const d = JSON.parse(saved);
-                getEl('mainNovelTitle').value = d.title; getEl('globalIdea').value = d.idea; getEl('apiKey').value = d.key; getEl('modelSelect').value = d.model;
-                chapters = d.chapters;
-                switchChapter(activeIdx);
+                getEl('mainNovelTitle').value = d.title; getEl('globalIdea').value = d.idea; getEl('apiKey').value = d.key;
+                if(d.key) fetchModels().then(() => { getEl('modelSelect').value = d.model; });
+                chapters = d.chapters; switchChapter(activeIdx);
             }
             setView('edit');
-            renderNav();
         }
 
-        function resetApp() { if(confirm("Hapus draf?")) { localStorage.clear(); location.reload(); } }
-        function rebuildChapter() { if(confirm("Buat ulang bab ini?")) runWritingProcess(); }
-        
         function exportAll(format) {
             const mainTitle = getEl('mainNovelTitle').value || "Novel";
-            let out = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{background:#f4ece0;padding:50px;font-family:serif;line-height:1.8;color:#1a1a1a;}.container{max-width:800px;margin:auto;background:white;padding:50px;box-shadow:0 0 10px rgba(0,0,0,0.05);border-radius:8px;}h1,h2{text-align:center;}p{text-indent:2.5rem;margin-bottom:1.5rem;text-align:justify;}</style></head><body><div class="container"><h1>${mainTitle}</h1>`;
+            let out = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{background:#d9cfb8;padding:50px;font-family:serif;line-height:1.8;color:#2c241a;}.container{max-width:900px;margin:auto;background:#e4dccb;padding:60px;box-shadow:0 0 20px rgba(0,0,0,0.1);border-radius:4px;}h1,h2{text-align:center;color:#3a3020;}p{text-indent:2.5rem;margin-bottom:1.5rem;text-align:justify;}</style></head><body><div class="container"><h1>${mainTitle}</h1>`;
             chapters.forEach(ch => { out += `<h2>${ch.label}: ${ch.title}</h2>${ch.content.split('\n').filter(p=>p.trim()!="").map(p=>`<p>${p.trim()}</p>`).join('')}<hr>`; });
             out += `</div></body></html>`;
             const blob = new Blob([out], { type: 'text/html' });
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${mainTitle}.html`; a.click();
         }
-    </script>
 
-    <div id="loader" class="hidden fixed inset-0 z-[200] bg-black/95 flex flex-col items-center justify-center text-center">
-        <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p class="text-[10px] font-black tracking-widest text-blue-500 uppercase">Menghubungkan Takdir...</p>
-    </div>
+        function resetApp() { if(confirm("Hapus?")) { localStorage.clear(); location.reload(); } }
+        function rebuildChapter() { if(confirm("Revisi?")) runWritingProcess(); }
+        function updateChapterData() { chapters[activeIdx].title = getEl('currentTitle').value; chapters[activeIdx].content = getEl('mainContent').value; chapters[activeIdx].instruction = getEl('chapterInstruction').value; saveAll(); }
+    </script>
 </body>
 </html>
