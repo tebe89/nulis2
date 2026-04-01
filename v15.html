@@ -6,89 +6,140 @@
     <title>v15 EVOLUTION - Serial Writer Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;700&family=Inter:wght@400;900&display=swap');
-        body { background-color: #050505; color: #d1d1d1; font-family: 'Inter', sans-serif; }
-        .novel-editor { font-family: 'Crimson Pro', serif; font-size: 1.25rem; line-height: 1.8; background: #0a0a0a; border: 1px solid #1a1a1a; color: #e5e5e5; padding: 40px; border-radius: 20px; width: 100%; outline: none; min-height: 60vh; }
-        .sidebar-item { transition: 0.3s; cursor: pointer; border-left: 3px solid transparent; }
-        .sidebar-item.active { background: #111; border-left-color: #3b82f6; color: white; }
-        .input-dark { background: #111; border: 1px solid #222; color: white; border-radius: 10px; padding: 10px; outline: none; width: 100%; }
-        .btn-blue { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; font-weight: 900; }
-        .custom-scroll::-webkit-scrollbar { width: 5px; }
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;700;900&display=swap');
+        
+        body { background-color: #050505; color: #d1d1d1; font-family: 'Inter', sans-serif; overflow: hidden; }
+        
+        /* Typography */
+        .novel-editor { 
+            font-family: 'Crimson Pro', serif; 
+            font-size: 1.3rem; 
+            line-height: 1.8; 
+            background: #0a0a0a; 
+            border: 1px solid #1a1a1a; 
+            color: #e5e5e5; 
+            padding: 40px; 
+            border-radius: 24px; 
+            width: 100%; 
+            outline: none; 
+            min-height: 70vh;
+            resize: none;
+        }
+
+        /* Sidebar & Scrolling Logic */
+        .sidebar-container { 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            background-color: #080808;
+            border-right: 1px solid #1a1a1a;
+        }
+        .chapter-nav-area {
+            flex-grow: 1;
+            overflow-y: auto; /* Mengaktifkan Scroll di Sidebar */
+            padding: 10px;
+        }
+        .sidebar-item { 
+            transition: 0.2s; 
+            cursor: pointer; 
+            border-left: 3px solid transparent; 
+            margin-bottom: 4px;
+        }
+        .sidebar-item.active { 
+            background: #111; 
+            border-left-color: #3b82f6; 
+            color: white; 
+        }
+
+        /* Scrollbar Styling */
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+
+        .input-dark { background: #111; border: 1px solid #222; color: white; border-radius: 10px; padding: 10px; outline: none; width: 100%; transition: 0.3s; }
+        .input-dark:focus { border-color: #3b82f6; }
+        
+        .btn-blue { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; font-weight: 900; }
+        .btn-blue:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* Loader Animation */
+        .loader { width: 40px; height: 40px; border: 4px solid #1a1a1a; border-bottom-color: #3b82f6; border-radius: 50%; animation: rotation 1s linear infinite; }
+        @keyframes rotation { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
-    <div class="w-72 bg-[#080808] border-r border-gray-900 flex flex-col">
+    <div class="w-72 sidebar-container flex-shrink-0">
         <div class="p-6 border-b border-gray-900">
             <h1 class="text-xl font-black tracking-tighter text-blue-500 uppercase italic">v15 EVOLUTION</h1>
         </div>
         
         <div class="p-4 space-y-4 border-b border-gray-900">
             <div class="space-y-1">
-                <label class="text-[9px] font-black text-gray-600 uppercase">Judul Utama Novel</label>
-                <input type="text" id="mainNovelTitle" placeholder="Nama Mahakarya..." class="input-dark text-xs font-bold" oninput="saveAll()">
+                <label class="text-[9px] font-black text-gray-500 uppercase tracking-widest">Judul Utama Novel</label>
+                <input type="text" id="mainNovelTitle" placeholder="Misal: Takdir Sang Kaisar" class="input-dark text-xs font-bold" oninput="saveAll()">
             </div>
             <div class="space-y-1">
-                <label class="text-[9px] font-black text-gray-600 uppercase">Engine Access</label>
-                <input type="password" id="apiKey" placeholder="Gemini API Key..." class="text-[10px] input-dark">
-                <button onclick="checkAPI()" id="apiStatus" class="w-full py-2 bg-gray-900 text-[9px] font-black rounded-lg uppercase border border-gray-800">Cek Engine</button>
+                <label class="text-[9px] font-black text-gray-500 uppercase tracking-widest">Gemini Engine Access</label>
+                <input type="password" id="apiKey" placeholder="Input API Key..." class="text-[10px] input-dark">
+                <button onclick="checkAPI()" id="apiStatus" class="w-full py-2 bg-gray-900 text-[9px] font-black rounded-lg uppercase border border-gray-800 transition">Cek Engine</button>
             </div>
         </div>
 
-        <div id="chapterList" class="flex-1 overflow-y-auto custom-scroll p-2 space-y-1">
+        <div id="chapterList" class="chapter-nav-area custom-scroll">
             </div>
 
-        <div class="p-4 border-t border-gray-900 space-y-2">
-            <button onclick="exportAll('txt')" class="w-full py-2 bg-gray-800 text-[10px] font-bold rounded-lg uppercase">Ekspor TXT</button>
-            <button onclick="exportAll('html')" class="w-full py-2 border border-blue-900 text-blue-500 text-[10px] font-bold rounded-lg uppercase">Ekspor HTML</button>
-            <button onclick="resetApp()" class="w-full py-1 text-[8px] text-red-900 font-bold uppercase mt-2">Hapus Draf</button>
+        <div class="p-4 border-t border-gray-900 space-y-2 bg-[#080808]">
+            <button onclick="exportAll('txt')" class="w-full py-2 bg-gray-800 text-[10px] font-bold rounded-lg uppercase hover:bg-gray-700">Ekspor TXT</button>
+            <button onclick="exportAll('html')" class="w-full py-2 border border-blue-900 text-blue-500 text-[10px] font-bold rounded-lg uppercase hover:bg-blue-950/20">Ekspor HTML</button>
+            <button onclick="resetApp()" class="w-full py-1 text-[8px] text-red-900 font-bold uppercase mt-2">Hapus Seluruh Draf</button>
         </div>
     </div>
 
     <div class="flex-1 flex flex-col h-screen relative">
         <header class="h-16 border-b border-gray-900 flex items-center justify-between px-10 bg-black/50 backdrop-blur-md">
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-6">
                 <span id="currentChapterLabel" class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Prolog</span>
-                <input type="text" id="currentChapterTitle" placeholder="Judul Bab Ini..." class="bg-transparent border-none text-white font-bold text-lg outline-none w-64" oninput="updateChapterData()">
+                <input type="text" id="currentChapterTitle" placeholder="Berikan Judul Bab..." class="bg-transparent border-none text-white font-black text-xl outline-none w-80" oninput="updateChapterData()">
             </div>
             <div class="flex gap-4">
-                <button onclick="writeChapter()" id="writeBtn" class="px-8 py-2 btn-blue rounded-full text-xs shadow-lg shadow-blue-900/20 uppercase tracking-widest">TULIS NARASI</button>
-                <button onclick="addNewChapter()" class="px-6 py-2 bg-white text-black font-black rounded-full text-[10px] uppercase hover:bg-blue-500 transition">Bab Baru +</button>
+                <button onclick="writeChapter()" id="writeBtn" class="px-10 py-2.5 btn-blue rounded-full text-xs shadow-lg shadow-blue-900/20 uppercase tracking-widest">TULIS NARASI</button>
+                <button onclick="addNewChapter()" class="px-6 py-2 bg-white text-black font-black rounded-full text-[10px] uppercase hover:bg-blue-500 hover:text-white transition">Bab Baru +</button>
             </div>
         </header>
 
         <main class="flex-1 overflow-y-auto p-10 custom-scroll bg-[#050505]">
-            <div class="max-w-4xl mx-auto space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="max-w-4xl mx-auto space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2">
-                        <label class="text-[9px] font-black text-gray-600 uppercase">Konsep Dunia & Sistem</label>
-                        <textarea id="globalIdea" rows="2" class="text-xs input-dark" placeholder="Garis besar cerita, aturan sistem, dll..." oninput="saveAll()"></textarea>
+                        <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Konsep Dunia & Aturan Sistem</label>
+                        <textarea id="globalIdea" rows="3" class="text-xs input-dark" placeholder="Garis besar cerita, sistem kultivasi, latar belakang dunia..." oninput="saveAll()"></textarea>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-[9px] font-black text-gray-600 uppercase">Tujuan / Instruksi Bab Ini</label>
-                        <textarea id="chapterInstruction" rows="2" class="text-xs input-dark" placeholder="Apa yang terjadi di bab ini?" oninput="updateChapterData()"></textarea>
+                        <label class="text-[10px] font-black text-blue-500 uppercase tracking-widest italic">Tujuan Bab (Instruksi Narasi)</label>
+                        <textarea id="chapterInstruction" rows="3" class="text-xs input-dark border-blue-900/50" placeholder="Apa yang ingin dicapai di bab ini?" oninput="updateChapterData()"></textarea>
                     </div>
                 </div>
 
-                <textarea id="mainContent" class="novel-editor" placeholder="Narasi bab..." oninput="updateChapterData()"></textarea>
+                <textarea id="mainContent" class="novel-editor custom-scroll" placeholder="Klik 'Tulis Narasi' untuk memulai bab ini..." oninput="updateChapterData()"></textarea>
                 
-                <div class="bg-[#0a0a0a] border border-gray-900 p-4 rounded-xl">
-                    <label class="text-[9px] font-black text-blue-500 uppercase italic">Memory Bridge (Logika Cerita)</label>
-                    <div id="memoryBridge" class="text-[11px] text-gray-500 italic mt-1">Belum ada memori.</div>
+                <div class="bg-[#0a0a0a] border border-gray-900 p-6 rounded-3xl">
+                    <label class="text-[10px] font-black text-blue-500 uppercase italic tracking-widest mb-2 block">Memory Bridge (Logika Estafet)</label>
+                    <div id="memoryBridge" class="text-xs text-gray-500 italic leading-relaxed">Belum ada memori yang tercatat untuk bab ini.</div>
                 </div>
             </div>
         </main>
 
         <div id="loader" class="hidden absolute inset-0 z-50 bg-black/90 flex flex-col items-center justify-center">
-            <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p id="loaderMsg" class="text-[10px] font-black tracking-widest text-blue-500 uppercase">Engine Sedang Menulis...</p>
+            <div class="loader mb-6"></div>
+            <p id="loaderMsg" class="text-[10px] font-black tracking-[0.4em] text-blue-500 uppercase">Engine Sedang Menulis...</p>
         </div>
     </div>
 
     <script>
         // PROLOG DEFAULT INSTRUCTION
-        const PROLOG_DEFAULT = "Perkenalkan karakter utama secara mendalam, jelaskan latar belakang dunianya, aturan sistem yang ia miliki, dan bagaimana konflik pertama kali muncul. Fokus pada detail sensorik dan suasana.";
+        const PROLOG_DEFAULT = "Perkenalkan karakter utama secara mendalam, jelaskan latar belakang dunianya, aturan sistem drama/kekuatan yang ia miliki, dan bagaimana konflik pertama kali muncul. Fokus pada detail sensorik, suasana, dan jangan meringkas alur.";
         
         let chapters = [{ 
             label: "Prolog", 
@@ -101,34 +152,38 @@
 
         const getEl = id => document.getElementById(id);
 
+        // --- CORE AI LOGIC ---
         async function writeChapter() {
             const key = getEl('apiKey').value;
-            if(!key) return alert("Isi API Key!");
+            if(!key) return alert("API Key belum diisi!");
 
             getEl('loader').classList.remove('hidden');
             getEl('loaderMsg').innerText = "Menyusun Narasi Panjang...";
 
+            // Menarik konteks dari bab sebelumnya (Estafet)
             let prevContext = "";
             if (activeIdx > 0) {
                 const prev = chapters[activeIdx - 1];
-                prevContext = `SAMBUNGAN LANGSUNG DARI BAB SEBELUMNYA:
-                - Akhir Teks: "...${prev.content.slice(-1200)}"
-                - Status Logika: ${prev.bridge}\n`;
+                prevContext = `SITUASI TERAKHIR BAB SEBELUMNYA:
+                - Akhir Teks: "...${prev.content.slice(-1500)}"
+                - Memori Logika: ${prev.bridge}
+                INSTRUKSI: Sambungkan tepat dari titik ini secara linear dan organik.\n`;
             }
 
-            const prompt = `PENULIS NOVEL PROFESIONAL.
+            const prompt = `BERTINDAKLAH SEBAGAI PENULIS NOVEL PROFESIONAL.
             JUDUL NOVEL: ${getEl('mainNovelTitle').value}
             DUNIA & SISTEM: ${getEl('globalIdea').value}
-            GAYA: Sastra, Deskriptif, Clean (Tanpa basa-basi).
+            GAYA BAHASA: Sastra Mendalam, Deskriptif, Tanpa Basa-basi (Clean).
             
             ${prevContext}
-            INSTRUKSI BAB INI: ${getEl('chapterInstruction').value}
+            TUJUAN BAB INI (${chapters[activeIdx].label}): ${getEl('chapterInstruction').value}
             
-            ATURAN KETAT:
-            1. Tulis narasi LANGSUNG. Jangan menyapa user.
-            2. Minimal 1500 kata. Ekspansi adegan sedetail mungkin.
-            3. Jika ini Prolog, fokus pada pondasi karakter dan dunia.
-            4. Jika ini Bab Lanjutan, pastikan alur menyambung sempurna tanpa pengulangan intro.`;
+            ATURAN PENULISAN:
+            1. Tulis narasi LANGSUNG. Jangan menyapa pembaca atau memberikan penjelasan.
+            2. Minimal 1500-2000 kata. Ekspansi setiap adegan dengan detail sensorik (suara, bau, perasaan batin).
+            3. Jika ini Prolog, bangun pondasi karakter dan dunia yang kuat.
+            4. Jika ini Bab Lanjutan, pastikan alur menyambung sempurna tanpa mengulang perkenalan karakter yang sudah diketahui pembaca.
+            5. Gunakan teknik 'Show, Don't Tell'.`;
 
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
@@ -142,12 +197,12 @@
                 getEl('mainContent').value = text;
                 chapters[activeIdx].content = text;
 
-                // Auto Bridge
-                getEl('loaderMsg').innerText = "Meringkas Logika Bab...";
+                // Auto Memory Bridge Generation
+                getEl('loaderMsg').innerText = "Meringkas Status Cerita...";
                 const bRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: `Analisis teks bab ini dan catat poin penting (lokasi, barang, status tokoh) untuk bab selanjutnya: ${text.substring(0, 3000)}` }] }] })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: `Catat poin penting untuk kelanjutan bab (lokasi terakhir, status misi, item baru, emosi tokoh): ${text.substring(0, 3000)}` }] }] })
                 });
                 const bd = await bRes.json();
                 const bridge = bd.candidates[0].content.parts[0].text.trim();
@@ -157,10 +212,13 @@
 
                 saveAll();
                 renderChapterList();
-            } catch (e) { alert("Error!"); }
-            finally { getEl('loader').classList.add('hidden'); }
+            } catch (e) { 
+                alert("Terjadi kesalahan koneksi atau limit API."); 
+                console.error(e);
+            } finally { getEl('loader').classList.add('hidden'); }
         }
 
+        // --- NAVIGATION & UI ---
         function addNewChapter() {
             const num = chapters.length;
             chapters.push({ label: `Bab ${num}`, title: "", content: "", bridge: "", instruction: "" });
@@ -174,7 +232,7 @@
             getEl('currentChapterTitle').value = ch.title;
             getEl('chapterInstruction').value = ch.instruction;
             getEl('mainContent').value = ch.content;
-            getEl('memoryBridge').innerText = ch.bridge || "Belum ada memori.";
+            getEl('memoryBridge').innerText = ch.bridge || "Belum ada memori terdeteksi.";
             renderChapterList();
         }
 
@@ -191,13 +249,17 @@
             container.innerHTML = "";
             chapters.forEach((ch, i) => {
                 const div = document.createElement('div');
-                div.className = `sidebar-item p-3 text-[10px] font-bold rounded-lg ${i === activeIdx ? 'active' : 'text-gray-500'}`;
-                div.innerHTML = `<div>${ch.label}</div><div class="text-[8px] opacity-50 truncate">${ch.title || '(Tanpa Judul)'}</div>`;
+                div.className = `sidebar-item p-4 rounded-2xl ${i === activeIdx ? 'active' : 'text-gray-500 hover:bg-white/5'}`;
+                div.innerHTML = `
+                    <div class="text-[10px] font-black uppercase tracking-widest">${ch.label}</div>
+                    <div class="text-[9px] opacity-60 truncate font-bold mt-1">${ch.title || '(Tanpa Judul)'}</div>
+                `;
                 div.onclick = () => switchChapter(i);
                 container.appendChild(div);
             });
         }
 
+        // --- DATA & PERSISTENCE ---
         function saveAll() {
             const data = { 
                 mainTitle: getEl('mainNovelTitle').value,
@@ -205,11 +267,11 @@
                 chapters: chapters, 
                 key: getEl('apiKey').value 
             };
-            localStorage.setItem('tebe_v15_evolution_pro', JSON.stringify(data));
+            localStorage.setItem('tebe_v15_evolution_v2', JSON.stringify(data));
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem('tebe_v15_evolution_pro');
+            const saved = localStorage.getItem('tebe_v15_evolution_v2');
             if(saved) {
                 const d = JSON.parse(saved);
                 getEl('mainNovelTitle').value = d.mainTitle || "";
@@ -217,38 +279,47 @@
                 getEl('apiKey').value = d.key || "";
                 chapters = d.chapters;
                 switchChapter(activeIdx);
-            } else { renderChapterList(); }
+            } else { 
+                renderChapterList(); 
+            }
         }
 
         function exportAll(format) {
-            const mainTitle = getEl('mainNovelTitle').value || "Novel";
+            const mainTitle = getEl('mainNovelTitle').value || "Novel_Mahakarya";
             let out = "";
             if(format === 'html') {
-                out = `<html><body style="font-family:serif; padding:50px; background:#f4ece0; line-height:1.8;">`;
-                out += `<h1 style="text-align:center; font-size:3rem;">${mainTitle}</h1><hr>`;
+                out = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{background:#f4ece0;padding:50px;font-family:serif;line-height:1.8;} .page{max-width:800px;margin:auto;background:white;padding:60px;box-shadow:0 0 10px rgba(0,0,0,0.1); border-radius:8px;} h1,h2{text-align:center;color:#8b6b23;} p{text-indent:3rem;margin-bottom:1.5rem;text-align:justify;}</style></head><body>`;
+                out += `<div class="page"><h1>${mainTitle}</h1><hr>`;
                 chapters.forEach(ch => {
-                    out += `<h2 style="text-align:center;">${ch.label}: ${ch.title}</h2><p style="white-space:pre-wrap;">${ch.content}</p><hr>`;
+                    out += `<h2>${ch.label}: ${ch.title}</h2>${ch.content.split('\n').filter(p=>p.trim()!="").map(p=>`<p>${p.trim()}</p>`).join('')}<hr>`;
                 });
-                out += `</body></html>`;
+                out += `</div></body></html>`;
             } else {
-                out = `JUDUL UTAMA: ${mainTitle}\n\n`;
+                out = `JUDUL NOVEL: ${mainTitle.toUpperCase()}\nKONSEP: ${getEl('globalIdea').value}\n\n`;
                 chapters.forEach(ch => {
-                    out += `\n\n--- ${ch.label}: ${ch.title} ---\n\n${ch.content}`;
+                    out += `\n\n--- ${ch.label.toUpperCase()}: ${ch.title.toUpperCase()} ---\n\n${ch.content}`;
                 });
             }
             const blob = new Blob([out], { type: format === 'html' ? 'text/html' : 'text/plain' });
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${mainTitle}.${format}`; a.click();
         }
 
-        function resetApp() { if(confirm("Hapus seluruh draf?")) { localStorage.clear(); location.reload(); } }
+        function resetApp() { if(confirm("PERINGATAN: Ini akan menghapus seluruh naskah Anda. Lanjutkan?")) { localStorage.clear(); location.reload(); } }
+        
         async function checkAPI() { 
             const key = getEl('apiKey').value;
-            if(!key) return alert("Key Kosong");
-            getEl('apiStatus').innerText = "Koneksi...";
+            if(!key) return alert("Isi Key terlebih dahulu.");
+            getEl('apiStatus').innerText = "MENCOBA KONEKSI...";
             try { 
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
-                if(res.ok) { getEl('apiStatus').innerText = "ONLINE"; getEl('apiStatus').style.color = "#3b82f6"; }
-            } catch(e) { alert("Gagal"); }
+                if(res.ok) { 
+                    getEl('apiStatus').innerText = "ENGINE ONLINE ✓"; 
+                    getEl('apiStatus').style.color = "#3b82f6";
+                } else {
+                    alert("API Key tidak valid.");
+                    getEl('apiStatus').innerText = "CEK ENGINE";
+                }
+            } catch(e) { alert("Gagal terhubung."); }
         }
     </script>
 </body>
