@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>v15 STREAM - Choice Edition</title>
+    <title>v15 STREAM - Reborn Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;700;900&display=swap');
@@ -13,39 +13,41 @@
         .master-layout { 
             display: grid; 
             grid-template-columns: 260px 1fr; 
-            grid-template-rows: 70px 1fr;
+            grid-template-rows: 80px 1fr;
             height: 100vh; 
         }
 
-        /* HEADER */
+        /* TOP NAV (FIXED) */
         .top-nav { 
             grid-column: 1 / -1; 
             background: #0a0a0a; border-bottom: 1px solid #1a1a1a;
-            display: flex; align-items: center; padding: 0 20px; gap: 15px; z-index: 100;
+            display: flex; align-items: center; padding: 0 20px; gap: 12px; z-index: 100;
         }
 
-        /* SIDEBAR */
+        /* SIDEBAR (SCROLLABLE) */
         .sidebar { background: #080808; border-right: 1px solid #1a1a1a; display: flex; flex-direction: column; overflow: hidden; }
         .chapter-nav { flex: 1; overflow-y: auto; padding: 10px; -webkit-overflow-scrolling: touch; }
 
-        /* EDITOR */
+        /* MAIN EDITOR (SCROLLABLE) */
         .main-editor { background: #050505; overflow-y: auto; padding: 25px; -webkit-overflow-scrolling: touch; }
         .novel-paper { 
-            font-family: 'Crimson Pro', serif; font-size: 1.3rem; line-height: 1.8; background: #0a0a0a; 
-            border: 1px solid #1a1a1a; color: #e5e5e5; padding: 30px; border-radius: 20px; width: 100%; 
-            outline: none; min-height: 600px; resize: none;
+            font-family: 'Crimson Pro', serif; font-size: 1.35rem; line-height: 1.9; background: #0a0a0a; 
+            border: 1px solid #1a1a1a; color: #e5e5e5; padding: 35px; border-radius: 20px; width: 100%; 
+            outline: none; min-height: 700px; resize: none;
         }
 
-        /* CARDS */
-        .option-card { background: #111; border: 1px solid #222; padding: 15px; border-radius: 15px; cursor: pointer; transition: 0.3s; }
-        .option-card:hover { border-color: #3b82f6; background: #151b2b; }
-        .sidebar-item { padding: 12px; margin-bottom: 5px; border-radius: 10px; cursor: pointer; border-left: 4px solid transparent; font-size: 11px; background: #0c0c0c; }
-        .sidebar-item.active { background: #1a1a1a; border-left-color: #3b82f6; color: white; }
+        /* COMPONENTS */
+        .option-card { background: #0d0d0d; border: 1px solid #222; padding: 20px; border-radius: 18px; cursor: pointer; transition: 0.3s; }
+        .option-card:hover { border-color: #3b82f6; background: #111827; transform: translateY(-3px); }
+        .sidebar-item { padding: 14px; margin-bottom: 6px; border-radius: 12px; cursor: pointer; border-left: 4px solid transparent; font-size: 11px; background: #0c0c0c; transition: 0.2s; }
+        .sidebar-item.active { background: #111; border-left-color: #3b82f6; color: white; font-weight: bold; }
 
-        .input-dark { background: #111; border: 1px solid #222; color: white; border-radius: 8px; padding: 8px 12px; outline: none; font-size: 11px; }
-        .loader { width: 30px; height: 30px; border: 3px solid #111; border-bottom-color: #3b82f6; border-radius: 50%; animation: rotation 1s linear infinite; }
+        .input-dark { background: #111; border: 1px solid #222; color: white; border-radius: 10px; padding: 8px 12px; outline: none; font-size: 11px; }
+        .select-model { background: #111; border: 1px solid #3b82f6; color: #3b82f6; border-radius: 10px; padding: 8px; font-size: 10px; font-weight: 800; outline: none; cursor: pointer; }
+        
+        .loader { width: 35px; height: 35px; border: 4px solid #111; border-bottom-color: #3b82f6; border-radius: 50%; animation: rotation 1s linear infinite; }
         @keyframes rotation { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }
-        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
     </style>
 </head>
@@ -53,51 +55,69 @@
 
     <div class="master-layout">
         <header class="top-nav">
-            <h1 class="text-blue-500 font-black italic text-lg tracking-tighter flex-shrink-0">v15 STREAM</h1>
-            <input type="text" id="mainNovelTitle" placeholder="Judul Novel Utama..." class="input-dark w-48 font-bold" oninput="saveAll()">
-            <input type="password" id="apiKey" placeholder="API Key..." class="input-dark w-48">
-            <select id="modelSelect" class="input-dark text-blue-400 font-bold">
-                <option value="gemini-1.5-pro">Gemini 1.5 PRO</option>
-                <option value="gemini-1.5-flash">Gemini 1.5 FLASH</option>
-            </select>
+            <h1 class="text-blue-600 font-black italic text-lg tracking-tighter flex-shrink-0">v15 STREAM</h1>
+            <input type="text" id="mainNovelTitle" placeholder="Judul Novel..." class="input-dark w-40 font-bold" oninput="saveAll()">
+            <input type="password" id="apiKey" placeholder="API Key..." class="input-dark w-40">
+            
+            <button onclick="fetchModels()" id="btnFetch" class="text-[9px] font-black text-gray-500 uppercase hover:text-blue-500">Hubungkan</button>
+            
+            <select id="modelSelect" class="select-model hidden">
+                </select>
+
             <div class="flex-1"></div>
-            <button onclick="exportAll('txt')" class="px-3 py-1.5 bg-gray-800 text-[10px] font-bold rounded-lg uppercase">TXT</button>
-            <button onclick="exportAll('html')" class="px-3 py-1.5 border border-blue-900 text-blue-500 text-[10px] font-bold rounded-lg uppercase ml-2">HTML</button>
+            
+            <div class="flex gap-2">
+                <button onclick="exportAll('txt')" class="px-4 py-2 bg-gray-900 text-[10px] font-black rounded-lg uppercase border border-gray-800">TXT</button>
+                <button onclick="exportAll('html')" class="px-4 py-2 border border-blue-900 text-blue-500 text-[10px] font-black rounded-lg uppercase">HTML</button>
+            </div>
         </header>
 
         <aside class="sidebar">
             <div class="p-4 border-b border-gray-900 flex justify-between items-center">
-                <span class="text-[10px] font-bold text-gray-500 uppercase">Navigasi Bab</span>
-                <button onclick="resetApp()" class="text-[8px] text-red-900 font-bold uppercase">Reset</button>
+                <span class="text-[10px] font-black text-gray-600 uppercase tracking-widest">Alur Takdir</span>
+                <button onclick="resetApp()" class="text-[8px] text-red-900 font-bold opacity-40 uppercase">Reset</button>
             </div>
-            <div id="chapterNav" class="chapter-nav"></div>
+            <div id="chapterNav" class="chapter-nav">
+                </div>
         </aside>
 
         <main class="main-editor">
-            <div class="max-w-4xl mx-auto space-y-6">
-                <div class="flex items-center justify-between bg-[#0a0a0a] p-5 rounded-2xl border border-gray-900">
+            <div class="max-w-4xl mx-auto space-y-8">
+                <div class="flex items-center justify-between bg-[#0a0a0a] p-6 rounded-3xl border border-gray-900">
                     <div class="flex flex-col flex-1">
-                        <span id="currentLabel" class="text-[9px] font-black text-blue-500 uppercase tracking-widest">Prolog</span>
-                        <input type="text" id="currentTitle" placeholder="Judul Bab..." class="bg-transparent border-none text-white font-bold text-xl outline-none w-full" oninput="updateChapterData()">
+                        <span id="currentLabel" class="text-[10px] font-black text-blue-600 uppercase tracking-widest">Mulai Perjalanan</span>
+                        <input type="text" id="currentTitle" placeholder="Judul Bab..." class="bg-transparent border-none text-white font-black text-2xl outline-none w-full" oninput="updateChapterData()">
                     </div>
                     <div id="mainActionArea">
-                        <button onclick="generateProlog()" id="startBtn" class="px-8 py-2 bg-blue-600 text-white font-black rounded-full text-xs uppercase tracking-widest">Mulai Prolog</button>
+                        <button onclick="generateProlog()" id="startBtn" class="px-10 py-3 bg-blue-600 text-white font-black rounded-full text-xs uppercase tracking-widest shadow-lg shadow-blue-900/20">Tulis Prolog</button>
                     </div>
                 </div>
 
-                <div class="bg-[#080808] p-4 rounded-xl border border-gray-900 space-y-3">
-                    <label class="text-[9px] font-black text-gray-500 uppercase">Konsep Dasar Dunia & Sistem</label>
-                    <textarea id="globalIdea" rows="2" class="input-dark w-full" placeholder="Ketik aturan dunia, sistem kekuatan, atau takdir utama di sini..."></textarea>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black text-gray-500 uppercase tracking-widest">Konsep Dunia & Sistem</label>
+                        <textarea id="globalIdea" rows="2" class="input-dark w-full" placeholder="Aturan dunia, kultivasi, dll..."></textarea>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black text-blue-500 uppercase tracking-widest italic">Petunjuk Tambahan</label>
+                        <textarea id="extraContext" rows="2" class="input-dark w-full border-blue-900/20" placeholder="Opsional: arahkan AI lebih spesifik..."></textarea>
+                    </div>
                 </div>
 
-                <textarea id="mainContent" class="novel-paper" placeholder="Narasi cerita..." oninput="updateChapterData()"></textarea>
+                <textarea id="mainContent" class="novel-paper" placeholder="Naskah akan muncul di sini..." oninput="updateChapterData()"></textarea>
 
-                <div id="choiceArea" class="hidden space-y-4 pb-20">
-                    <h3 class="text-xs font-black text-blue-500 uppercase tracking-[0.3em] text-center italic">Pilih Kelanjutan Takdir</h3>
-                    <div id="optionsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div id="choiceArea" class="hidden space-y-6 pb-32">
+                    <div class="flex items-center gap-4">
+                        <div class="h-[1px] flex-1 bg-gray-900"></div>
+                        <h3 class="text-[10px] font-black text-blue-500 uppercase tracking-[0.4em] italic">Pilih Cabang Takdir</h3>
+                        <div class="h-[1px] flex-1 bg-gray-900"></div>
+                    </div>
+                    
+                    <div id="optionsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-5">
                         </div>
+                    
                     <div class="text-center">
-                        <button onclick="finishStory()" class="text-[10px] text-red-500 font-black border border-red-900 px-6 py-2 rounded-full uppercase">Akhiri Cerita (Epilog)</button>
+                        <button onclick="finishStory()" class="text-[10px] text-red-700 font-black border border-red-950 px-8 py-3 rounded-full uppercase hover:bg-red-950/20 transition">Akhiri Cerita (EPILOG)</button>
                     </div>
                 </div>
 
@@ -106,8 +126,8 @@
         </main>
 
         <div id="loader" class="hidden fixed inset-0 z-[200] bg-black/95 flex flex-col items-center justify-center text-center">
-            <div class="loader mb-4"></div>
-            <p id="loaderMsg" class="text-[10px] font-black tracking-widest text-blue-500 uppercase">Menenun Takdir Cerita...</p>
+            <div class="loader mb-6"></div>
+            <p id="loaderMsg" class="text-[10px] font-black tracking-[0.5em] text-blue-600 uppercase italic">Menenun Realitas...</p>
         </div>
     </div>
 
@@ -116,15 +136,33 @@
         let activeIdx = 0;
         const getEl = id => document.getElementById(id);
 
-        // --- CORE AI ---
+        // --- MODEL FETCHING ---
+        async function fetchModels() {
+            const key = getEl('apiKey').value;
+            if(!key) return alert("Input API Key!");
+            getEl('btnFetch').innerText = "Connecting...";
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+                const data = await res.json();
+                if(data.models) {
+                    const sel = getEl('modelSelect');
+                    const filtered = data.models.filter(m => m.supportedGenerationMethods.includes('generateContent'));
+                    sel.innerHTML = filtered.map(m => `<option value="${m.name}">${m.displayName.replace("Gemini ","")}</option>`).join('');
+                    sel.classList.remove('hidden');
+                    getEl('btnFetch').classList.add('hidden');
+                }
+            } catch (e) { alert("Gagal mengambil model."); }
+        }
+
+        // --- AI LOGIC ---
         async function callAI(prompt, msg) {
             const key = getEl('apiKey').value;
             const model = getEl('modelSelect').value;
-            if(!key) { alert("Input API Key!"); return null; }
+            if(!key || !model) { alert("Key & Model harus siap!"); return null; }
             getEl('loader').classList.remove('hidden');
             getEl('loaderMsg').innerText = msg;
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${key}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
@@ -137,8 +175,8 @@
         async function generateProlog() {
             const idea = getEl('globalIdea').value;
             if(!idea) return alert("Isi Konsep Dunia dulu!");
-            const prompt = `Tulis narasi PROLOG novel. DUNIA: ${idea}. GAYA: Sastra mendalam, deskriptif, minimal 1500 kata. Langsung naskah.`;
-            const text = await callAI(prompt, "Menulis Prolog...");
+            const prompt = `Tulis narasi PROLOG novel. DUNIA: ${idea}. TAMBAHAN: ${getEl('extraContext').value}. GAYA: Sastra deskriptif, minimal 1500 kata. Langsung naskah tanpa salam.`;
+            const text = await callAI(prompt, "MENULIS PROLOG...");
             if(text) {
                 chapters[0].content = text;
                 getEl('mainContent').value = text;
@@ -151,51 +189,51 @@
 
         async function showChoices() {
             const currentText = chapters[activeIdx].content;
-            const idea = getEl('globalIdea').value;
-            const prompt = `Berdasarkan narasi ini: "${currentText.slice(-2000)}". Berikan 3 pilihan judul dan ringkasan alur singkat untuk bab selanjutnya. Format JSON: [{"judul": "...", "alur": "..."}, dst]`;
-            const raw = await callAI(prompt, "Merancang Pilihan Bab...");
+            const prompt = `Berdasarkan narasi terakhir ini: "${currentText.slice(-2000)}". Berikan 3 opsi judul dan ringkasan alur sangat singkat untuk bab selanjutnya. Format JSON: [{"judul": "...", "alur": "..."}, dst]`;
+            const raw = await callAI(prompt, "MERANCANG TAKDIR...");
             if(raw) {
-                const options = JSON.parse(raw.substring(raw.indexOf('['), raw.lastIndexOf(']') + 1));
-                const grid = getEl('optionsGrid');
-                grid.innerHTML = "";
-                options.forEach(opt => {
-                    const div = document.createElement('div');
-                    div.className = "option-card";
-                    div.innerHTML = `<h4 class="text-blue-500 font-bold text-xs mb-2">${opt.judul}</h4><p class="text-[10px] text-gray-500">${opt.alur}</p>`;
-                    div.onclick = () => startNextChapter(opt.judul, opt.alur);
-                    grid.appendChild(div);
-                });
-                getEl('choiceArea').classList.remove('hidden');
+                try {
+                    const options = JSON.parse(raw.substring(raw.indexOf('['), raw.lastIndexOf(']') + 1));
+                    const grid = getEl('optionsGrid');
+                    grid.innerHTML = "";
+                    options.forEach(opt => {
+                        const div = document.createElement('div');
+                        div.className = "option-card shadow-lg";
+                        div.innerHTML = `<h4 class="text-blue-500 font-black text-[11px] mb-2 uppercase tracking-wider">${opt.judul}</h4><p class="text-[10px] text-gray-500 italic leading-relaxed">${opt.alur}</p>`;
+                        div.onclick = () => startNextChapter(opt.judul, opt.alur);
+                        grid.appendChild(div);
+                    });
+                    getEl('choiceArea').classList.remove('hidden');
+                    getEl('choiceArea').scrollIntoView({ behavior: 'smooth' });
+                } catch(e) { alert("Gagal merinci pilihan. Coba klik lagi."); }
             }
         }
 
         async function startNextChapter(title, alur) {
             const prev = chapters[activeIdx];
             const idea = getEl('globalIdea').value;
-            const newIdx = chapters.length;
-            
-            const prompt = `Tulis narasi Bab ${newIdx}. JUDUL: ${title}. ALUR: ${alur}. KONTEKS SEBELUMNYA: "${prev.content.slice(-1500)}". DUNIA: ${idea}. ATURAN: Minimal 1500 kata, deskriptif, sambung langsung secara linear.`;
-            const text = await callAI(prompt, `Menulis ${title}...`);
-            
+            const num = chapters.length;
+            const prompt = `Tulis narasi Bab ${num}. JUDUL: ${title}. ALUR: ${alur}. KONTEKS: "${prev.content.slice(-1500)}". DUNIA: ${idea}. ATURAN: Minimal 1500 kata, deskriptif sensorik, sambung langsung linear. Tanpa basa-basi.`;
+            const text = await callAI(prompt, `MENENUN BAB ${num}...`);
             if(text) {
-                chapters.push({ label: `Bab ${newIdx}`, title: title, content: text, bridge: "" });
-                switchChapter(newIdx);
+                chapters.push({ label: `Bab ${num}`, title: title, content: text, bridge: "" });
+                switchChapter(chapters.length - 1);
             }
         }
 
         async function finishStory() {
             const prev = chapters[activeIdx];
             const idea = getEl('globalIdea').value;
-            const prompt = `Tulis EPILOG penutup novel ini. Selesaikan semua konflik. KONTEKS TERAKHIR: "${prev.content.slice(-2000)}". DUNIA: ${idea}. Minimal 1500 kata.`;
-            const text = await callAI(prompt, "Menulis Penutup...");
+            const prompt = `Tulis EPILOG penutup novel. Selesaikan semua konflik. KONTEKS: "${prev.content.slice(-2000)}". DUNIA: ${idea}. Minimal 1500 kata.`;
+            const text = await callAI(prompt, "MENUTUP TAKDIR...");
             if(text) {
                 chapters.push({ label: "Epilog", title: "Akhir Perjalanan", content: text, bridge: "" });
                 switchChapter(chapters.length - 1);
-                getEl('choiceArea').innerHTML = "<h2 class='text-center text-green-500 font-black italic'>CERITA SELESAI. SILAKAN EKSPOR.</h2>";
+                getEl('choiceArea').innerHTML = "<div class='p-10 text-center text-blue-500 font-black italic tracking-widest border border-blue-900 rounded-3xl'>MAHAKARYA SELESAI. SILAKAN EKSPOR.</div>";
             }
         }
 
-        // --- UI & NAV ---
+        // --- UI LOGIC ---
         function switchChapter(idx) {
             activeIdx = idx;
             const ch = chapters[idx];
@@ -203,7 +241,6 @@
             getEl('currentTitle').value = ch.title;
             getEl('mainContent').value = ch.content;
             
-            // Tampilkan pilihan hanya di bab terakhir
             if(idx === chapters.length - 1 && ch.label !== "Epilog" && ch.content !== "") {
                 showChoices();
             } else {
@@ -218,11 +255,12 @@
             nav.innerHTML = "";
             chapters.forEach((ch, i) => {
                 const div = document.createElement('div');
-                div.className = `sidebar-item ${i === activeIdx ? 'active' : ''}`;
-                div.innerHTML = `<b>${ch.label}</b><br><span class="opacity-50 truncate block">${ch.title || '...'}</span>`;
+                div.className = `sidebar-item shadow-sm ${i === activeIdx ? 'active' : ''}`;
+                div.innerHTML = `<b>${ch.label}</b><br><span class="opacity-50 truncate block">${ch.title || '(Draft)'}</span>`;
                 div.onclick = () => switchChapter(i);
                 nav.appendChild(div);
             });
+            const sp = document.createElement('div'); sp.style.height = "100px"; nav.appendChild(sp);
         }
 
         function updateChapterData() {
@@ -232,30 +270,30 @@
         }
 
         function saveAll() {
-            const data = { title: getEl('mainNovelTitle').value, idea: getEl('globalIdea').value, chapters, key: getEl('apiKey').value };
-            localStorage.setItem('v15_stream_data', JSON.stringify(data));
+            const data = { title: getEl('mainNovelTitle').value, idea: getEl('globalIdea').value, chapters, key: getEl('apiKey').value, model: getEl('modelSelect').value };
+            localStorage.setItem('tebe_v15_stream_reborn', JSON.stringify(data));
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem('v15_stream_data');
+            const saved = localStorage.getItem('tebe_v15_stream_reborn');
             if(saved) {
                 const d = JSON.parse(saved);
                 getEl('mainNovelTitle').value = d.title || "";
                 getEl('globalIdea').value = d.idea || "";
                 getEl('apiKey').value = d.key || "";
+                if(d.key) fetchModels().then(() => { getEl('modelSelect').value = d.model || "gemini-1.5-pro"; });
                 chapters = d.chapters;
                 if(chapters[0].content !== "") getEl('startBtn').classList.add('hidden');
                 switchChapter(chapters.length - 1);
-            }
-            renderNav();
+            } else { renderNav(); }
         }
 
         function exportAll(format) {
             const mainTitle = getEl('mainNovelTitle').value || "Novel";
             let out = "";
             if(format === 'html') {
-                out = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{background:#f4ece0;padding:50px;font-family:serif;line-height:1.8;} .container{max-width:800px;margin:auto;background:white;padding:50px;box-shadow:0 0 10px rgba(0,0,0,0.05);border-radius:5px;} h1,h2{text-align:center;} p{text-indent:2rem;margin-bottom:1rem;text-align:justify;}</style></head><body><div class="container"><h1>${mainTitle}</h1>`;
-                chapters.forEach(ch => { out += `<h2>${ch.label}: ${ch.title}</h2>${ch.content.split('\n').map(p=>`<p>${p}</p>`).join('')}<hr>`; });
+                out = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{background:#f4ece0;padding:50px;font-family:serif;line-height:1.8;color:#1a1a1a;}.container{max-width:800px;margin:auto;background:white;padding:60px;box-shadow:0 0 10px rgba(0,0,0,0.05);border-radius:8px;}h1,h2{text-align:center;}p{text-indent:3rem;margin-bottom:1.5rem;text-align:justify;}</style></head><body><div class="container"><h1>${mainTitle}</h1>`;
+                chapters.forEach(ch => { out += `<h2>${ch.label}: ${ch.title}</h2>${ch.content.split('\n').filter(p=>p.trim()!="").map(p=>`<p>${p.trim()}</p>`).join('')}<hr>`; });
                 out += `</div></body></html>`;
             } else {
                 chapters.forEach(ch => { out += `\n\n--- ${ch.label}: ${ch.title} ---\n\n${ch.content}`; });
