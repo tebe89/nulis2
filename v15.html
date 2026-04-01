@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>v15 STREAM - Professional Reader</title>
+    <title>v15 STREAM - Pro Reader Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;700;900&display=swap');
@@ -13,7 +13,7 @@
         .master-layout { 
             display: grid; 
             grid-template-columns: 280px 1fr; 
-            grid-template-rows: 70px 1fr;
+            grid-template-rows: 75px 1fr;
             height: 100vh; 
             transition: all 0.3s ease;
         }
@@ -67,7 +67,9 @@
             <div class="flex-1 flex gap-2 items-center">
                 <input type="text" id="mainNovelTitle" placeholder="Judul Novel..." class="input-dark w-32 font-bold" oninput="saveAll()">
                 <input type="password" id="apiKey" placeholder="API Key..." class="input-dark w-32">
-                <button onclick="fetchModels()" id="btnFetch" class="text-[9px] font-black text-gray-500 uppercase">Hubungkan</button>
+                
+                <button onclick="fetchModels()" id="btnFetch" class="px-3 py-2 bg-gray-800 text-white text-[9px] font-black rounded-lg uppercase hover:bg-gray-700 transition">Hubungkan</button>
+                
                 <select id="modelSelect" class="select-model hidden"></select>
             </div>
 
@@ -87,32 +89,32 @@
             <div id="contentContainer" class="max-w-5xl mx-auto space-y-6 pb-40">
                 
                 <div id="editControls" class="space-y-6">
-                    <div class="flex items-center justify-between bg-[#0a0a0a] p-5 rounded-3xl border border-gray-900">
+                    <div class="flex items-center justify-between bg-[#0a0a0a] p-5 rounded-3xl border border-gray-900 shadow-xl">
                         <div class="flex flex-col flex-1">
-                            <span id="currentLabel" class="text-[10px] font-black text-blue-600 uppercase tracking-widest">Prolog</span>
-                            <input type="text" id="currentTitle" placeholder="Judul Bab..." class="bg-transparent border-none text-white font-bold text-2xl outline-none w-full">
+                            <span id="currentLabel" class="text-[10px] font-black text-blue-600 uppercase tracking-widest italic">Prolog</span>
+                            <input type="text" id="currentTitle" placeholder="Judul Bab..." class="bg-transparent border-none text-white font-black text-2xl outline-none w-full" oninput="updateChapterData()">
                         </div>
                         <button onclick="runWritingProcess()" id="writeBtn" class="px-8 py-3 bg-blue-600 text-white font-black rounded-full text-[10px] uppercase shadow-lg shadow-blue-900/30">BUAT NARASI</button>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <textarea id="globalIdea" rows="3" class="input-dark w-full" placeholder="Konsep Dunia..." oninput="saveAll()"></textarea>
-                        <textarea id="chapterInstruction" rows="3" class="input-dark w-full border-blue-900/20" placeholder="Alur Bab Ini..." oninput="updateChapterData()"></textarea>
+                        <textarea id="globalIdea" rows="3" class="input-dark w-full" placeholder="Konsep Dunia & Sistem..." oninput="saveAll()"></textarea>
+                        <textarea id="chapterInstruction" rows="3" class="input-dark w-full border-blue-900/20" placeholder="Apa yang terjadi di bab ini?" oninput="updateChapterData()"></textarea>
                     </div>
                 </div>
 
                 <div id="displayArea">
-                    <textarea id="mainContent" class="edit-view hidden" oninput="updateChapterData()" placeholder="Narasi..."></textarea>
+                    <textarea id="mainContent" class="edit-view hidden" oninput="updateChapterData()" placeholder="Narasi naskah akan muncul di sini..."></textarea>
                     <div id="readerArea" class="reader-view hidden"></div>
                 </div>
 
                 <div id="bgStatus" class="hidden bg-blue-900/20 border border-blue-800 p-4 rounded-xl flex items-center gap-4">
                     <div class="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                    <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest italic">AI Sedang Menulis di Latar Belakang...</span>
+                    <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest italic tracking-wider">AI sedang menenun takdir bab ini di latar belakang...</span>
                 </div>
 
                 <div class="flex justify-between items-center pt-10">
-                    <button onclick="rebuildChapter()" class="text-[9px] font-black text-gray-500 uppercase tracking-widest">Buat Ulang Bab</button>
+                    <button onclick="rebuildChapter()" class="text-[9px] font-black text-gray-500 uppercase tracking-widest border border-gray-800 px-6 py-2 rounded-full">Buat Ulang Bab</button>
                     <button onclick="prepareNextChapter()" id="nextBtn" class="px-10 py-3 bg-blue-600 text-white font-black rounded-full text-[10px] uppercase tracking-widest">SIAPKAN BAB BERIKUTNYA</button>
                 </div>
             </div>
@@ -130,9 +132,11 @@
 
         function toggleSidebar() { getEl('master').classList.toggle('sidebar-hidden'); }
 
+        // FUNGSI FETCH MODEL GEMINI
         async function fetchModels() {
             const key = getEl('apiKey').value;
-            if(!key) return alert("Input API Key!");
+            if(!key) return alert("Masukan API Key dulu!");
+            getEl('btnFetch').innerText = "Tunggu...";
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
                 const data = await res.json();
@@ -143,7 +147,7 @@
                     sel.classList.remove('hidden');
                     getEl('btnFetch').classList.add('hidden');
                 }
-            } catch (e) { alert("Gagal koneksi API."); }
+            } catch (e) { alert("Gagal mengambil model. Cek Key Anda."); getEl('btnFetch').innerText = "Hubungkan"; }
         }
 
         function setView(mode) {
@@ -164,11 +168,12 @@
 
         function renderReader() {
             const ch = chapters[activeIdx];
-            const content = ch.content ? ch.content.split('\n').filter(p=>p.trim()!="").map(p=>`<p>${p.trim()}</p>`).join('') : "<p style='text-align:center; opacity:0.3;'>Belum ada narasi.</p>";
+            const content = ch.content ? ch.content.split('\n').filter(p=>p.trim()!="").map(p=>`<p>${p.trim()}</p>`).join('') : "<p style='text-align:center; opacity:0.3; margin-top:100px;'>AI belum menulis narasi untuk bab ini.</p>";
             getEl('readerArea').innerHTML = `<h1 style="text-align:center; font-size:2.8rem; color:#3a3020; margin-bottom:40px;">${ch.title}</h1>${content}`;
             getEl('mainView').scrollTop = 0;
         }
 
+        // FUNGSI PENULISAN DI LATAR BELAKANG
         async function runWritingProcess() {
             if(isWriting) return;
             const key = getEl('apiKey').value;
@@ -176,17 +181,16 @@
             const idea = getEl('globalIdea').value;
             const instr = getEl('chapterInstruction').value;
 
-            if(!key || !model || !idea) return alert("API Key dan Konsep harus diisi!");
+            if(!key || !model || !idea) return alert("Pilih model dan isi konsep dulu!");
 
             isWriting = true;
             getEl('bgStatus').classList.remove('hidden');
             getEl('writeBtn').disabled = true;
 
             let prev = activeIdx > 0 ? `SAMBUNGAN: "...${chapters[activeIdx-1].content.slice(-1500)}"\n` : "";
-            const prompt = `PENULIS NOVEL. DUNIA: ${idea}\n${prev}BAB INI: ${instr}\nATURAN: Tulis narasi langsung naskah (min 1500 kata). Deep & Deskriptif.`;
+            const prompt = `PENULIS NOVEL. DUNIA: ${idea}\n${prev}BAB INI: ${instr}\nATURAN: Tulis narasi naskah langsung (min 1500 kata). Sangat detail dan deskriptif. Tanpa salam.`;
 
             try {
-                // FIXED API CALL URL
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${key}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -200,13 +204,8 @@
                     if(currentMode === 'read') renderReader();
                     showToast();
                     saveAll();
-                } else {
-                    throw new Error("Respon API tidak valid.");
-                }
-            } catch (e) { 
-                console.error(e);
-                alert("Gagal menulis narasi. Periksa API Key atau kuota Anda."); 
-            }
+                } else { throw new Error("Gagal!"); }
+            } catch (e) { alert("API Error! Cek koneksi."); }
             finally {
                 isWriting = false;
                 getEl('bgStatus').classList.add('hidden');
@@ -219,9 +218,10 @@
         async function prepareNextChapter() {
             const key = getEl('apiKey').value;
             const model = getEl('modelSelect').value || "models/gemini-1.5-flash";
-            if(!key || !chapters[activeIdx].content) return alert("Selesaikan bab ini dulu!");
+            if(!key || !chapters[activeIdx].content) return alert("Buat narasi bab ini dulu!");
             
-            const prompt = `Analisis bab ini: "${chapters[activeIdx].content.slice(-1500)}". Berikan rencana alur pendek bab selanjutnya.`;
+            getEl('loader').classList.remove('hidden');
+            const prompt = `Analisis bab ini: "${chapters[activeIdx].content.slice(-1500)}". Berikan rencana alur pendek bab selanjutnya. Tulis alurnya saja.`;
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${key}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -229,9 +229,11 @@
                 });
                 const d = await res.json();
                 const nextAlur = d.candidates[0].content.parts[0].text.trim();
-                chapters.push({ label: `Bab ${chapters.length}`, title: `Bab ${chapters.length}`, content: "", instruction: nextAlur });
-                switchChapter(chapters.length - 1);
+                const newIdx = chapters.length;
+                chapters.push({ label: `Bab ${newIdx}`, title: `Bab ${newIdx}`, content: "", instruction: nextAlur });
+                switchChapter(newIdx);
             } catch(e) { alert("Gagal merancang alur."); }
+            finally { getEl('loader').classList.add('hidden'); }
         }
 
         function switchChapter(idx) {
@@ -251,7 +253,7 @@
             chapters.forEach((ch, i) => {
                 const div = document.createElement('div');
                 div.className = `sidebar-item ${i === activeIdx ? 'active' : ''}`;
-                div.innerHTML = `<b>${ch.label}</b><br><span class="opacity-50 truncate block">${ch.title}</span>`;
+                div.innerHTML = `<b>${ch.label}</b><br><span class="opacity-50 truncate block text-[9px]">${ch.title}</span>`;
                 div.onclick = () => switchChapter(i);
                 nav.appendChild(div);
             });
@@ -259,11 +261,11 @@
 
         function saveAll() {
             const data = { title: getEl('mainNovelTitle').value, idea: getEl('globalIdea').value, chapters, key: getEl('apiKey').value, model: getEl('modelSelect').value };
-            localStorage.setItem('v15_reader_final_v2', JSON.stringify(data));
+            localStorage.setItem('v15_reader_pro_fixed', JSON.stringify(data));
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem('v15_reader_final_v2');
+            const saved = localStorage.getItem('v15_reader_pro_fixed');
             if(saved) {
                 const d = JSON.parse(saved);
                 getEl('mainNovelTitle').value = d.title || ""; getEl('globalIdea').value = d.idea || ""; getEl('apiKey').value = d.key || "";
@@ -282,9 +284,20 @@
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${mainTitle}.html`; a.click();
         }
 
-        function resetApp() { if(confirm("Hapus?")) { localStorage.clear(); location.reload(); } }
-        function rebuildChapter() { if(confirm("Revisi?")) runWritingProcess(); }
-        function updateChapterData() { chapters[activeIdx].title = getEl('currentTitle').value; chapters[activeIdx].content = getEl('mainContent').value; chapters[activeIdx].instruction = getEl('chapterInstruction').value; saveAll(); }
+        function resetApp() { if(confirm("Hapus seluruh draf?")) { localStorage.clear(); location.reload(); } }
+        function rebuildChapter() { if(confirm("Revisi bab ini?")) runWritingProcess(); }
+        function updateChapterData() { 
+            chapters[activeIdx].title = getEl('currentTitle').value; 
+            chapters[activeIdx].content = getEl('mainContent').value; 
+            chapters[activeIdx].instruction = getEl('chapterInstruction').value; 
+            saveAll(); 
+            renderNav();
+        }
     </script>
+
+    <div id="loader" class="hidden fixed inset-0 z-[200] bg-black/95 flex flex-col items-center justify-center text-center">
+        <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="text-[10px] font-black tracking-widest text-blue-500 uppercase">Mempersiapkan Takdir...</p>
+    </div>
 </body>
 </html>
