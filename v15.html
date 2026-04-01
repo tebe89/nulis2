@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>v15 STREAM - Bang Tebe Stability</title>
+    <title>v15 STREAM - Bang Tebe Pro Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;700;900&display=swap');
@@ -15,28 +15,28 @@
             grid-template-columns: 280px 1fr; 
             grid-template-rows: auto 1fr;
             height: 100vh; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
         }
 
         .sidebar-hidden { grid-template-columns: 0px 1fr; }
 
-        /* NAV BAR RESPONSIVE */
+        /* HEADER FIX */
         .top-nav { 
             grid-column: 1 / -1; 
             background: #0a0a0a; border-bottom: 1px solid #1a1a1a;
-            display: flex; flex-direction: column; padding: 10px; gap: 10px; z-index: 100;
+            display: flex; flex-direction: column; padding: 10px; gap: 8px; z-index: 100;
         }
 
         .nav-row-1 { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-        .nav-row-2 { display: flex; align-items: center; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+        .nav-row-2 { display: flex; align-items: center; gap: 8px; overflow-x: auto; white-space: nowrap; padding-bottom: 2px; }
 
         /* SIDEBAR */
         .sidebar { background: #080808; border-right: 1px solid #1a1a1a; display: flex; flex-direction: column; overflow: hidden; }
         .chapter-nav { flex: 1; overflow-y: auto; padding: 10px; -webkit-overflow-scrolling: touch; }
 
-        /* READER MODE - DARK CREAM */
+        /* READER VIEW */
         .reader-view { 
-            font-family: 'Crimson Pro', serif; font-size: 1.45rem; line-height: 1.9; 
+            font-family: 'Crimson Pro', serif; font-size: 1.45rem; line-height: 1.85; 
             background: #d1c7ac; color: #2c241a; padding: 40px 25px; 
             border-radius: 4px; box-shadow: 0 0 40px rgba(0,0,0,0.3);
             max-width: 100%; margin: 0 auto; min-height: 100%; text-align: justify;
@@ -45,28 +45,28 @@
 
         .edit-view { 
             font-family: 'Crimson Pro', serif; font-size: 1.25rem; line-height: 1.8; 
-            background: #0a0a0a; color: #e5e5e5; padding: 25px; 
-            border-radius: 15px; border: 1px solid #1a1a1a; width: 100%; 
+            background: #0a0a0a; color: #e5e5e5; padding: 20px; 
+            border-radius: 12px; border: 1px solid #1a1a1a; width: 100%; 
             outline: none; min-height: 500px; resize: none;
         }
 
-        .sidebar-item { padding: 14px; margin-bottom: 6px; border-radius: 10px; cursor: pointer; border-left: 4px solid transparent; font-size: 11px; background: #0c0c0c; transition: 0.2s; }
+        .sidebar-item { padding: 12px; margin-bottom: 5px; border-radius: 8px; cursor: pointer; border-left: 4px solid transparent; font-size: 10px; background: #0c0c0c; }
         .sidebar-item.active { background: #111; border-left-color: #3b82f6; color: white; font-weight: bold; }
         
-        .btn-ui { padding: 8px 14px; font-size: 10px; font-weight: 900; text-transform: uppercase; border-radius: 8px; transition: 0.2s; }
+        /* UI Buttons */
+        .btn-ui { padding: 8px 14px; font-size: 10px; font-weight: 900; text-transform: uppercase; border-radius: 6px; }
         .btn-blue { background: #2563eb; color: white; }
         .btn-outline { border: 1px solid #3b82f6; color: #3b82f6; }
         .btn-dark { background: #111; border: 1px solid #333; color: #999; }
 
         #toast { 
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
-            background: #10b981; color: white; padding: 12px 25px; border-radius: 50px;
-            font-weight: 800; font-size: 10px; transition: 0.5s; z-index: 1000;
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: #10b981; color: white; padding: 10px 20px; border-radius: 50px;
+            font-weight: 800; font-size: 9px; transition: 0.5s; z-index: 1000;
         }
         #toast.show { transform: translateX(-50%) translateY(0); }
 
-        .input-dark { background: #111; border: 1px solid #222; color: white; border-radius: 8px; padding: 8px 12px; outline: none; font-size: 11px; }
-        
+        .input-dark { background: #111; border: 1px solid #222; color: white; border-radius: 6px; padding: 6px 10px; outline: none; font-size: 10px; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #222; }
     </style>
@@ -77,8 +77,8 @@
         <header class="top-nav">
             <div class="nav-row-1">
                 <div class="flex items-center gap-3">
-                    <button onclick="toggleSidebar()" class="btn-ui btn-dark" style="font-size: 18px; padding: 5px 12px;">☰</button>
-                    <h1 class="text-blue-500 font-black italic uppercase text-sm tracking-tighter">v15 STREAM</h1>
+                    <button onclick="toggleSidebar()" class="btn-ui btn-dark" style="font-size: 16px;">☰</button>
+                    <h1 class="text-blue-500 font-black italic uppercase text-sm">v15 STREAM</h1>
                 </div>
                 <div class="flex gap-2">
                     <button onclick="setView('read')" id="btnRead" class="btn-ui btn-dark">BACA</button>
@@ -90,62 +90,56 @@
             <div id="configRow" class="nav-row-2">
                 <input type="text" id="mainNovelTitle" placeholder="Judul Novel..." class="input-dark w-32 font-bold" oninput="saveAll()">
                 <input type="password" id="apiKey" placeholder="API Key..." class="input-dark w-32">
-                <button onclick="fetchModels()" id="btnFetch" class="btn-ui btn-dark border border-gray-800">Hubungkan</button>
+                <button type="button" onclick="fetchModels()" id="btnFetch" class="btn-ui btn-dark border border-gray-700">Hubungkan</button>
                 <select id="modelSelect" class="input-dark hidden border-blue-900 text-blue-400 font-bold" onchange="saveAll()"></select>
             </div>
         </header>
 
         <aside class="sidebar">
-            <div class="p-4 border-b border-gray-900 text-[10px] font-black text-gray-600 uppercase tracking-widest">Daftar Bab</div>
+            <div class="p-3 border-b border-gray-900 text-[9px] font-black text-gray-600 uppercase">Navigasi Bab</div>
             <div id="chapterNav" class="chapter-nav"></div>
         </aside>
 
         <main id="mainView" class="overflow-y-auto bg-[#050505] p-3">
-            <div id="contentContainer" class="max-w-5xl mx-auto space-y-6 pb-40">
+            <div id="contentContainer" class="max-w-5xl mx-auto space-y-5 pb-32">
                 
                 <div id="editControls" class="space-y-4">
-                    <div class="flex flex-col md:flex-row items-center justify-between bg-[#0a0a0a] p-5 rounded-2xl border border-gray-900 gap-4">
+                    <div class="flex flex-col md:flex-row items-center justify-between bg-[#0a0a0a] p-4 rounded-xl border border-gray-900 gap-3">
                         <div class="flex flex-col flex-1 w-full">
-                            <span id="currentLabel" class="text-[10px] font-black text-blue-600 uppercase italic">Prolog</span>
-                            <input type="text" id="currentTitle" placeholder="Judul Bab..." class="bg-transparent border-none text-white font-black text-2xl outline-none w-full" oninput="updateChapterData()">
+                            <span id="currentLabel" class="text-[9px] font-black text-blue-600 uppercase italic">Prolog</span>
+                            <input type="text" id="currentTitle" placeholder="Judul Bab..." class="bg-transparent border-none text-white font-black text-xl outline-none w-full" oninput="updateChapterData()">
                         </div>
-                        <button onclick="runWritingProcess()" id="writeBtn" class="w-full md:w-auto px-10 py-3 bg-blue-600 text-white font-black rounded-full text-[11px] uppercase shadow-lg shadow-blue-900/30">BUAT NARASI</button>
+                        <button onclick="runWritingProcess()" id="writeBtn" class="w-full md:w-auto px-8 py-3 bg-blue-600 text-white font-black rounded-full text-[10px] uppercase shadow-lg">BUAT NARASI</button>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-widest">Memory Global (Dunia/Tokoh)</label>
-                            <textarea id="globalIdea" rows="3" class="input-dark w-full" placeholder="Sistem kekuatan, Nama karakter, Fakta penting..." oninput="saveAll()"></textarea>
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-[9px] font-black text-blue-500 uppercase tracking-widest italic">Instruksi Alur Bab Ini</label>
-                            <textarea id="chapterInstruction" rows="3" class="input-dark w-full border-blue-900/20" placeholder="Apa yang akan terjadi di bab ini?" oninput="updateChapterData()"></textarea>
-                        </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <textarea id="globalIdea" rows="3" class="input-dark w-full" placeholder="Memory Global (Dunia/Tokoh)..." oninput="saveAll()"></textarea>
+                        <textarea id="chapterInstruction" rows="3" class="input-dark w-full border-blue-900/20" placeholder="Instruksi Bab Ini..." oninput="updateChapterData()"></textarea>
                     </div>
                 </div>
 
                 <div id="displayArea">
-                    <textarea id="mainContent" class="edit-view hidden" oninput="updateChapterData()" placeholder="Narasi naskah akan muncul di sini..."></textarea>
+                    <textarea id="mainContent" class="edit-view hidden" oninput="updateChapterData()" placeholder="Narasi..."></textarea>
                     <div id="readerArea" class="reader-view hidden"></div>
                 </div>
 
-                <div id="bgStatus" class="hidden bg-blue-900/10 border border-blue-900/30 p-4 rounded-xl flex items-center gap-4">
-                    <div class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                    <span class="text-[10px] font-black text-blue-400 uppercase italic">Bang Tebe, AI sedang menenun cerita di latar belakang...</span>
+                <div id="bgStatus" class="hidden bg-blue-900/10 border border-blue-900/30 p-3 rounded-lg flex items-center gap-3">
+                    <div class="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <span class="text-[9px] font-black text-blue-400 uppercase italic">Bang Tebe, AI sedang menulis...</span>
                 </div>
 
-                <div class="flex justify-between items-center pt-8">
-                    <button onclick="rebuildChapter()" class="text-[9px] font-black text-gray-500 uppercase tracking-widest border border-gray-800 px-6 py-2 rounded-full">Buat Ulang</button>
-                    <button onclick="prepareNextChapter()" id="nextBtn" class="px-8 py-3 bg-blue-600 text-white font-black rounded-full text-[10px] uppercase tracking-widest">Bab Berikutnya →</button>
+                <div class="flex justify-between items-center pt-4">
+                    <button onclick="rebuildChapter()" class="text-[8px] font-black text-gray-500 uppercase border border-gray-800 px-4 py-2 rounded-full">Buat Ulang</button>
+                    <button onclick="prepareNextChapter()" id="nextBtn" class="px-6 py-2 bg-blue-600 text-white font-black rounded-full text-[9px] uppercase">Bab Berikutnya →</button>
                 </div>
             </div>
         </main>
     </div>
 
-    <div id="toast">BAB SELESAI, BANG TEBE! ✓</div>
+    <div id="toast">SELESAI, BANG TEBE! ✓</div>
 
     <script>
-        let chapters = [{ label: "Prolog", title: "Awal Segalanya", content: "", instruction: "Perkenalkan dunia dan karakter utama." }];
+        let chapters = [{ label: "Prolog", title: "Awal Perjalanan", content: "", instruction: "Perkenalkan dunia dan karakter." }];
         let activeIdx = 0;
         let isWriting = false;
         let currentMode = 'edit';
@@ -155,8 +149,8 @@
 
         async function fetchModels() {
             const key = getEl('apiKey').value;
-            if(!key) return alert("Bang Tebe, Masukkan API Key dulu!");
-            getEl('btnFetch').innerText = "Connecting...";
+            if(!key) { alert("Input API Key dulu, Bang!"); return; }
+            getEl('btnFetch').innerText = "...";
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
                 const data = await res.json();
@@ -167,8 +161,8 @@
                     sel.classList.remove('hidden');
                     getEl('btnFetch').classList.add('hidden');
                     saveAll();
-                }
-            } catch (e) { alert("Key Salah atau Gagal Koneksi."); }
+                } else { throw new Error(); }
+            } catch (e) { alert("Key Salah / Gagal Koneksi."); }
             finally { getEl('btnFetch').innerText = "Hubungkan"; }
         }
 
@@ -192,29 +186,27 @@
 
         function renderReader() {
             const ch = chapters[activeIdx];
-            const content = ch.content ? ch.content.split('\n').filter(p=>p.trim()!="").map(p=>`<p>${p.trim()}</p>`).join('') : "<p style='text-align:center; opacity:0.3; margin-top:100px;'>AI belum menulis narasi.</p>";
-            getEl('readerArea').innerHTML = `<h1 style="text-align:center; font-size:2.8rem; color:#3a3020; margin-bottom:40px;">${ch.title}</h1>${content}`;
+            const content = ch.content ? ch.content.split('\n').filter(p=>p.trim()!="").map(p=>`<p>${p.trim()}</p>`).join('') : "<p style='text-align:center; opacity:0.3;'>Kosong.</p>";
+            getEl('readerArea').innerHTML = `<h1 style="text-align:center; font-size:2.2rem; color:#3a3020; margin-bottom:30px;">${ch.title}</h1>${content}`;
             getEl('mainView').scrollTop = 0;
         }
 
         async function runWritingProcess() {
             if(isWriting) return;
             const key = getEl('apiKey').value;
-            const model = getEl('modelSelect').value;
+            const modelSelect = getEl('modelSelect');
+            const model = modelSelect.value;
             const idea = getEl('globalIdea').value;
             const instr = getEl('chapterInstruction').value;
 
-            if(!key || !model) return alert("Bang Tebe, Klik 'Hubungkan' dan Pilih Model dulu!");
-            
+            if(!key || modelSelect.classList.contains('hidden')) { alert("Hubungkan API dulu, Bang!"); return; }
+
             isWriting = true;
             getEl('bgStatus').classList.remove('hidden');
             getEl('writeBtn').disabled = true;
-            getEl('writeBtn').innerText = "MENULIS...";
 
-            // Konteks estafet: Baca 2000 karakter terakhir bab sebelumnya jika ada
-            let prev = (activeIdx > 0 && chapters[activeIdx-1].content) ? `SAMBUNGAN BAB SEBELUMNYA: "...${chapters[activeIdx-1].content.slice(-2000)}"\n` : "";
-            
-            const prompt = `PENULIS NOVEL PROFESIONAL. MEMORY GLOBAL: ${idea}\n${prev}BAB INI (${chapters[activeIdx].label}): ${instr}\nATURAN: Tulis naskah narasi (min 1500 kata). Deep, Deskriptif, Organik.`;
+            let prevText = activeIdx > 0 ? `KONTEKS SEBELUMNYA: "...${chapters[activeIdx-1].content.slice(-2000)}"\n` : "";
+            const prompt = `PENULIS NOVEL PROFESIONAL. MEMORY GLOBAL: ${idea}\n${prevText}BAB INI: ${instr}\nATURAN: Tulis narasi naskah (min 1500 kata). Sambung cerita secara alami.`;
 
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${key}`, {
@@ -231,12 +223,7 @@
                     saveAll();
                 }
             } catch (e) { alert("API Error!"); }
-            finally { 
-                isWriting = false; 
-                getEl('bgStatus').classList.add('hidden'); 
-                getEl('writeBtn').disabled = false;
-                getEl('writeBtn').innerText = "BUAT NARASI";
-            }
+            finally { isWriting = false; getEl('bgStatus').classList.add('hidden'); getEl('writeBtn').disabled = false; }
         }
 
         function showToast() { getEl('toast').classList.add('show'); setTimeout(() => getEl('toast').classList.remove('show'), 3000); }
@@ -244,11 +231,10 @@
         async function prepareNextChapter() {
             const key = getEl('apiKey').value;
             const model = getEl('modelSelect').value || "models/gemini-1.5-flash";
-            if(!key || !chapters[activeIdx].content) return alert("Selesaikan narasi bab ini dulu, Bang!");
+            if(!key || !chapters[activeIdx].content) { alert("Selesaikan bab ini dulu!"); return; }
             
             getEl('loader').classList.remove('hidden');
-            const prompt = `Analisis bab ini: "${chapters[activeIdx].content.slice(-1500)}". Berikan rencana alur pendek bab selanjutnya secara logis. Tulis alurnya saja.`;
-            
+            const prompt = `Berdasarkan narasi bab ini: "${chapters[activeIdx].content.slice(-1500)}". Rancang instruksi alur singkat bab selanjutnya.`;
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${key}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -256,28 +242,21 @@
                 });
                 const d = await res.json();
                 const nextAlur = d.candidates[0].content.parts[0].text.trim();
-                
-                // PROTEKSI: Tambah bab baru di kontainer terpisah
-                const nextLabel = `Bab ${chapters.length}`;
-                chapters.push({ label: nextLabel, title: nextLabel, content: "", instruction: nextAlur });
-                
-                // Pastikan pindah ke bab baru
+                const nextNum = chapters.length;
+                chapters.push({ label: `Bab ${nextNum}`, title: `Bab ${nextNum}`, content: "", instruction: nextAlur });
                 saveAll();
                 switchChapter(chapters.length - 1);
-            } catch(e) { alert("Gagal merancang alur."); }
+            } catch(e) { alert("Gagal merancang bab baru."); }
             finally { getEl('loader').classList.add('hidden'); }
         }
 
         function switchChapter(idx) {
-            // Reset state sebelum pindah
             activeIdx = idx;
             const ch = chapters[idx];
-            
             getEl('currentLabel').innerText = ch.label;
             getEl('currentTitle').value = ch.title;
             getEl('chapterInstruction').value = ch.instruction;
             getEl('mainContent').value = ch.content;
-            
             if(currentMode === 'read') renderReader();
             renderNav();
             saveAll();
@@ -287,50 +266,52 @@
             const nav = getEl('chapterNav'); nav.innerHTML = "";
             chapters.forEach((ch, i) => {
                 const div = document.createElement('div');
-                div.className = `sidebar-item shadow-sm ${i === activeIdx ? 'active' : ''}`;
-                div.innerHTML = `<b>${ch.label}</b><br><span class=\"opacity-50 truncate block text-[10px]\">${ch.title}</span>`;
+                div.className = `sidebar-item ${i === activeIdx ? 'active' : ''}`;
+                div.innerHTML = `<b>${ch.label}</b><br><span class="opacity-50 truncate block">${ch.title}</span>`;
                 div.onclick = () => switchChapter(i);
                 nav.appendChild(div);
             });
         }
 
-        function updateChapterData() { 
-            chapters[activeIdx].title = getEl('currentTitle').value; 
-            chapters[activeIdx].content = getEl('mainContent').value; 
-            chapters[activeIdx].instruction = getEl('chapterInstruction').value; 
-            saveAll(); renderNav(); 
+        function updateChapterData() {
+            chapters[activeIdx].title = getEl('currentTitle').value;
+            chapters[activeIdx].content = getEl('mainContent').value;
+            chapters[activeIdx].instruction = getEl('chapterInstruction').value;
+            saveAll(); renderNav();
         }
 
         function saveAll() {
             const data = { title: getEl('mainNovelTitle').value, idea: getEl('globalIdea').value, chapters, key: getEl('apiKey').value, model: getEl('modelSelect').value };
-            localStorage.setItem('v15_tebe_absolute_stability', JSON.stringify(data));
+            localStorage.setItem('v15_tebe_final_stable', JSON.stringify(data));
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem('v15_tebe_absolute_stability');
+            const saved = localStorage.getItem('v15_tebe_final_stable');
             if(saved) {
                 const d = JSON.parse(saved);
-                getEl('mainNovelTitle').value = d.title || ""; getEl('globalIdea').value = d.idea || ""; getEl('apiKey').value = d.key || "";
+                getEl('mainNovelTitle').value = d.title; getEl('globalIdea').value = d.idea; getEl('apiKey').value = d.key;
                 if(d.key) fetchModels().then(() => { if(d.model) getEl('modelSelect').value = d.model; });
-                chapters = d.chapters; switchChapter(activeIdx);
-            } else { setView('edit'); }
+                chapters = d.chapters;
+                switchChapter(activeIdx);
+            }
+            setView('edit');
         }
 
         function exportAll(format) {
             const mainTitle = getEl('mainNovelTitle').value || "Novel";
-            let out = `<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><style>body{background:#d1c7ac;padding:50px;font-family:serif;line-height:1.8;color:#2c241a;}.container{max-width:950px;margin:auto;background:#e4dccb;padding:60px;box-shadow:0 0 20px rgba(0,0,0,0.1);border-radius:4px;}h1,h2{text-align:center;color:#3a3020;}p{text-indent:2.5rem;margin-bottom:1.5rem;text-align:justify;}</style></head><body><div class=\"container\"><h1>${mainTitle}</h1>`;
-            chapters.forEach(ch => { out += `<h2>${ch.label}: ${ch.title}</h2>${ch.content.split('\\n').filter(p=>p.trim()!=\"\").map(p=>`<p>${p.trim()}</p>`).join('')}<hr>`; });
+            let out = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{background:#d1c7ac;padding:50px;font-family:serif;line-height:1.8;color:#2c241a;}.container{max-width:900px;margin:auto;background:#e4dccb;padding:60px;box-shadow:0 0 20px rgba(0,0,0,0.1);border-radius:4px;}h1,h2{text-align:center;color:#3a3020;}p{text-indent:2.5rem;margin-bottom:1.5rem;text-align:justify;}</style></head><body><div class="container"><h1>${mainTitle}</h1>`;
+            chapters.forEach(ch => { out += `<h2>${ch.label}: ${ch.title}</h2>${ch.content.split('\n').filter(p=>p.trim()!="").map(p=>`<p>${p.trim()}</p>`).join('')}<hr>`; });
             out += `</div></body></html>`;
             const blob = new Blob([out], { type: 'text/html' });
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${mainTitle}.html`; a.click();
         }
 
-        function rebuildChapter() { if(confirm("Revisi bab ini, Bang Tebe?")) runWritingProcess(); }
+        function rebuildChapter() { if(confirm("Revisi?")) runWritingProcess(); }
     </script>
 
     <div id="loader" class="hidden fixed inset-0 z-[200] bg-black/95 flex flex-col items-center justify-center text-center">
-        <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p class="text-[10px] font-black tracking-widest text-blue-500 uppercase">Menghubungkan Benang Merah...</p>
+        <div class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-3"></div>
+        <p class="text-[9px] font-black text-blue-500 uppercase">Proses...</p>
     </div>
 </body>
 </html>
